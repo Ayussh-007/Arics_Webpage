@@ -1,36 +1,24 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import React from "react";
+import Navbar from "./components/Navbar";
+import HeroSection from "./components/HeroSection";
 import "./App.css";
 
-function App() {
-  const [count, setCount] = useState(0);
-
+const App = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      {console.log("Manthan")}
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
+      <Navbar />
+      <HeroSection />
+
+      {/* Extra scroll space to demonstrate bloom animation */}
+      <section className="h-screen bg-gradient-to-b from-pink-50 to-rose-100 flex items-center justify-center">
+        <div className="text-center text-gray-600">
+          <p className="text-xl font-['Cormorant_Garamond'] italic">
+            Scroll to see the bloom effect
+          </p>
+        </div>
+      </section>
+    </div>
   );
-}
+};
 
 export default App;
