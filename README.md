@@ -10,16 +10,25 @@ Luxury, glassmorphism-inspired bouquet customisation experience with a dynamic a
 - **👑 Admin Dashboard** - Manage products, flowers, and settings
 - **📱 Responsive Design** - Works on all devices
 - **✨ Glassmorphism UI** - Modern, elegant aesthetic
+- **📧 Email Notifications** - Order confirmations with payment QR codes
+- **💳 Payment QR** - Database-stored QR codes for UPI payments
+- **🖼️ Team Photos** - Real team member photos in About Us
 
 ## Stack
 - **Frontend:** React + Vite + Tailwind CSS + Framer Motion
 - **Backend:** Node.js + Express + MongoDB (Mongoose)
 - **Authentication:** JWT-based admin authentication
+- **Deployment:** Vercel (Frontend + Backend)
+- **Database:** MongoDB Atlas
 
 ## 📚 Documentation
 
 | Document | Purpose |
 |----------|---------|
+| **QUICK_DEPLOY.md** | ⭐ Quick deployment guide for Vercel |
+| **VERCEL_DEPLOYMENT.md** | Detailed deployment instructions |
+| **QR_IMAGE_MANAGEMENT.md** | QR code management system docs |
+| **INSTALLATION_INSTRUCTIONS.md** | QR setup instructions |
 | **PRODUCTS_QUICKSTART.md** | Quick setup guide for Products feature |
 | **PRODUCTS_IMPLEMENTATION.md** | Complete technical documentation |
 | **PRODUCTS_UI_GUIDE.md** | Visual component reference |
@@ -29,7 +38,7 @@ Luxury, glassmorphism-inspired bouquet customisation experience with a dynamic a
 | **ADMIN_ACCESS.md** | Admin features documentation |
 | **AGENTS.md** | Architecture and design decisions |
 
-## 🚀 Quick Start
+## 🚀 Local Development
 
 ### 1) Install frontend dependencies
 ```bash
@@ -48,6 +57,13 @@ MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=your_secret_key
 ADMIN_EMAIL=admin@arics.com
 ADMIN_PASSWORD=ChangeMe123!
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_app_password
+MAIL_FROM=Arics <your_email@gmail.com>
+PAYMENT_UPI_ID=your-upi-id@bank
+PAYMENT_UPI_NAME=Arics
 ```
 
 ### 4) Seed database
@@ -60,7 +76,13 @@ This creates:
 - Sample flowers
 - Customization options
 
-### 5) Run both client + server
+### 5) Upload QR image to database
+```bash
+cd server/src
+node utils/seedQrImage.js
+```
+
+### 6) Run both client + server
 ```bash
 npm run dev:all
 ```
@@ -79,6 +101,24 @@ npm --prefix server start
 - Backend: `http://localhost:5000`
 - Products: Click "PRODUCTS" in navbar
 - Admin: Click "ADMIN" in navbar
+
+## 🌐 Deploy to Vercel
+
+**Quick Start:** See `QUICK_DEPLOY.md` for step-by-step guide
+
+### Prerequisites
+- GitHub account
+- Vercel account (sign up with GitHub)
+- MongoDB Atlas account (free tier)
+
+### Deployment Steps
+1. Push code to GitHub
+2. Connect repository to Vercel
+3. Configure environment variables
+4. Deploy with one click
+5. Seed database with production data
+
+**Detailed Guide:** See `VERCEL_DEPLOYMENT.md`
 
 ## 🔐 Admin Login
 
@@ -112,7 +152,13 @@ Build custom bouquets with:
 - Paper and ribbon options
 - Add-ons (chocolates, cards, etc.)
 - Real-time price calculation
-- Order placement
+- Order placement with email confirmation
+
+### About Us
+- Team member profiles with real photos
+- Company story and philosophy
+- Services overview
+- Contact section
 
 ### Admin Dashboard
 
@@ -128,6 +174,12 @@ Build custom bouquets with:
 - Add offer badges
 - Mark as featured
 
+**QR Code Management:**
+- Upload payment QR codes
+- Store in database
+- Automatic email embedding
+- Admin panel interface
+
 **Dashboard Statistics:**
 - Total products count
 - Active products
@@ -138,7 +190,8 @@ Build custom bouquets with:
 - Manage flowers inventory
 - Configure customization options
 - Update site settings
-- Order management
+- Order management with status updates
+- Email notifications
 
 ## 📁 Project Structure
 
@@ -149,31 +202,49 @@ arics_webpage/
 │   │   ├── Navbar.jsx
 │   │   ├── HeroSection.jsx
 │   │   ├── Bloomanimation.jsx
-│   │   ├── ProductCard.jsx           # Product display component
-│   │   └── ProductForm.jsx           # Product create/edit form
+│   │   ├── ProductCard.jsx
+│   │   ├── ProductForm.jsx
+│   │   └── QrImageManager.jsx        # QR management UI
 │   ├── pages/
-│   │   ├── ProductsPage.jsx          # Customer product browsing
-│   │   └── AdminDashboard.jsx        # Admin product management
-│   ├── customisation/                # Bouquet builder
+│   │   ├── ProductsPage.jsx
+│   │   ├── AboutUs.jsx               # With team photos
+│   │   └── AdminDashboard.jsx
+│   ├── assets/
+│   │   ├── ayush.jpeg                # Team photos
+│   │   ├── bhagyashree.jpeg
+│   │   ├── manthan.jpeg
+│   │   └── qr.png                    # Payment QR
+│   ├── customisation/
 │   │   ├── CustomisationApp.jsx
 │   │   ├── components/
 │   │   └── pages/
-│   └── App.jsx                       # Main app with routing
+│   └── App.jsx
 ├── server/
 │   └── src/
 │       ├── models/
-│       │   ├── Product.js            # Product schema
+│       │   ├── Product.js
 │       │   ├── Flower.js
 │       │   ├── Order.js
-│       │   └── User.js
+│       │   ├── User.js
+│       │   └── AdminSettings.js      # With QR storage
 │       ├── routes/
-│       │   ├── products.js           # Product API endpoints
+│       │   ├── products.js
 │       │   ├── flowers.js
-│       │   └── auth.js
+│       │   ├── orders.js
+│       │   ├── auth.js
+│       │   └── adminSettings.js      # QR API routes
+│       ├── utils/
+│       │   ├── orderEmail.js         # Email with QR
+│       │   └── seedQrImage.js        # QR upload script
 │       ├── middleware/
-│       │   └── auth.js               # JWT authentication
-│       └── index.js
-└── Documentation/                    # See above table
+│       │   └── auth.js
+│       ├── assets/
+│       │   └── qr.png
+│       ├── index.js
+│       └── seed.js
+├── vercel.json                       # Vercel config
+├── QUICK_DEPLOY.md                   # Deployment guide
+└── Documentation/
 ```
 
 ## 🔌 API Endpoints
@@ -183,6 +254,7 @@ arics_webpage/
 GET    /api/products              # Get all active products with filters
 GET    /api/products/:id          # Get single product
 POST   /api/products/:id/view     # Increment popularity
+GET    /api/admin-settings/qr-image  # Get QR image
 ```
 
 ### Admin Routes (Protected)
@@ -192,6 +264,8 @@ POST   /api/products              # Create new product
 PUT    /api/products/:id          # Update product
 PATCH  /api/products/:id/toggle   # Toggle active status
 DELETE /api/products/:id          # Delete product
+POST   /api/admin-settings/qr-upload  # Upload QR code
+DELETE /api/admin-settings/qr-image   # Delete QR code
 ```
 
 ### Other Routes
@@ -199,7 +273,8 @@ DELETE /api/products/:id          # Delete product
 POST   /api/auth/login            # Admin login
 GET    /api/flowers               # Get flowers
 POST   /api/orders                # Place order
-...and more
+GET    /api/orders                # Get all orders (admin)
+PATCH  /api/orders/:id/status     # Update order status (admin)
 ```
 
 ## 🎨 Design System
@@ -248,16 +323,26 @@ npm --prefix server run seed    # Seed database
 npm run dev:all          # Run both frontend + backend
 ```
 
-### Environment Variables
+## 🌟 New Features
 
-Required in `server/.env`:
-```env
-MONGODB_URI=mongodb://localhost:27017/arics
-JWT_SECRET=your-secret-key-here
-ADMIN_EMAIL=admin@arics.com
-ADMIN_PASSWORD=ChangeMe123!
-PORT=5000
-```
+### QR Code Management System
+- Store QR codes in MongoDB
+- Admin panel upload interface
+- Automatic email embedding (base64)
+- Fallback to file system
+- See `QR_IMAGE_MANAGEMENT.md` for details
+
+### Team Photos
+- Real team member photos in About Us
+- Stored in `/src/assets`
+- Optimized loading
+- Responsive images
+
+### Enhanced Email System
+- Order confirmation emails
+- Status update emails
+- Embedded QR codes (base64)
+- Professional templates
 
 ## 🐛 Troubleshooting
 
@@ -268,40 +353,38 @@ curl http://localhost:5000/api/health
 
 # Reseed database
 npm --prefix server run seed
-
-# Check browser console for errors
 ```
 
 ### Images not loading?
-- Use valid HTTPS URLs (Unsplash, Cloudinary, etc.)
-- Avoid local file paths
-- Check CORS settings
+- Use valid HTTPS URLs or local imports
+- Check image paths are correct
+- Verify images exist in assets folder
+
+### QR code not showing in emails?
+```bash
+# Check if QR is in database
+curl http://localhost:5000/api/admin-settings/qr-image --output test-qr.png
+
+# Reseed QR image
+cd server/src
+node utils/seedQrImage.js
+```
 
 ### Admin can't login?
 - Verify credentials in server/.env
 - Reseed database to recreate admin user
 - Clear browser localStorage
 
-### More troubleshooting?
-See `PRODUCTS_QUICKSTART.md` for detailed solutions.
+## 🚀 Production Deployment
 
-## 🚀 Deployment
+### Environment Setup
+1. **MongoDB Atlas** - Create free cluster
+2. **Vercel** - Connect GitHub repository
+3. **Environment Variables** - Add in Vercel dashboard
+4. **Database Seeding** - Run seed scripts with production DB
+5. **QR Upload** - Upload QR image to production database
 
-### Frontend (Vercel/Netlify)
-```bash
-npm run build
-# Deploy dist/ folder
-```
-
-### Backend (Heroku/Railway)
-```bash
-cd server
-# Deploy with your platform's CLI
-```
-
-### Database
-- Use MongoDB Atlas for production
-- Update MONGODB_URI in environment variables
+See `QUICK_DEPLOY.md` or `VERCEL_DEPLOYMENT.md` for complete guide.
 
 ## 📊 Sample Data
 
@@ -310,6 +393,7 @@ The seed script creates:
 - **4 sample flowers** (Rose, Lily, Tulip, Orchid)
 - **Customization options** (paper types, ribbons, add-ons)
 - **Admin user** (admin@arics.com)
+- **Payment QR code** (stored in database)
 
 ## 🔐 Security
 
@@ -319,8 +403,9 @@ The seed script creates:
 - Input validation (client + server)
 - CORS configuration
 - Environment variables for secrets
+- Secure QR code storage in database
 
-## ✨ Key Features
+## ✨ Key Features Summary
 
 ### For Customers
 ✅ Browse luxury products  
@@ -329,7 +414,9 @@ The seed script creates:
 ✅ See stock availability  
 ✅ Customize bouquets  
 ✅ Place orders  
+✅ Receive email confirmations with QR  
 ✅ Responsive design  
+✅ Learn about the team
 
 ### For Admins
 ✅ Product CRUD operations  
@@ -340,6 +427,8 @@ The seed script creates:
 ✅ Featured products  
 ✅ Offer badges  
 ✅ Order management  
+✅ QR code management  
+✅ Email system with status updates
 
 ## 🎯 Future Enhancements
 
@@ -347,11 +436,13 @@ Planned features:
 - Product reviews and ratings
 - Bulk product operations
 - Advanced analytics dashboard
-- Email notifications
+- Email notifications for low stock
 - Wishlist functionality
 - Related products
 - SEO optimization
 - Multi-language support
+- Payment gateway integration
+- SMS notifications
 
 ## 📄 License
 
@@ -365,19 +456,23 @@ Built with modern best practices:
 - Material Design principles
 - WCAG accessibility
 - Mobile-first design
+- Serverless architecture (Vercel)
 
 ## 📞 Support
 
 For detailed documentation:
-- **Quick Start:** `PRODUCTS_QUICKSTART.md`
-- **Technical Docs:** `PRODUCTS_IMPLEMENTATION.md`
+- **Deployment:** `QUICK_DEPLOY.md` or `VERCEL_DEPLOYMENT.md`
+- **QR Management:** `QR_IMAGE_MANAGEMENT.md`
+- **Products:** `PRODUCTS_QUICKSTART.md`
+- **Technical:** `PRODUCTS_IMPLEMENTATION.md`
 - **UI Reference:** `PRODUCTS_UI_GUIDE.md`
-- **API Reference:** `PRODUCT_REFERENCE.json`
+- **API:** `PRODUCT_REFERENCE.json`
 
 ---
 
-**Version:** 1.0.0  
+**Version:** 2.0.0  
 **Status:** Production Ready ✅  
-**Last Updated:** January 28, 2026
+**Last Updated:** January 30, 2025  
+**Deployment:** Vercel-optimized
 
-**Built with ❤️ for Arics**
+**Built with 💐 for Arics by Bhagyashree, Ayush & Manthan**
