@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
-import ScrollBloomSection from "./components/ScrollBloomSection";
 import AboutUs from "./pages/AboutUs";
 import { CustomisationApp } from "./customisation";
 import ProductsPage from "./pages/ProductsPage";
@@ -27,8 +26,6 @@ const App = () => {
           <>
             <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
             <HeroSection />
-            {/* Scroll-controlled bloom animation */}
-            <ScrollBloomSection />
           </>
         );
     }

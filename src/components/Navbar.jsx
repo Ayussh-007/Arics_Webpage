@@ -153,6 +153,7 @@ const Navbar = ({ currentPage, setCurrentPage }) => {
               }`}
               whileHover={{ y: -2 }}
             >
+              ADMIN
               <span
                 className={`absolute -bottom-1 left-0 h-0.5 bg-pink-600 transition-all duration-300 ${
                   currentPage === "admin" ? "w-full" : "w-0 group-hover:w-full"

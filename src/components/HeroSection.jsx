@@ -68,9 +68,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-          >
-            This Valentine's Day
-          </motion.p>
+          ></motion.p>
 
           <motion.h1
             className="text-6xl md:text-7xl lg:text-8xl font-['Playfair_Display'] text-gray-900 mb-6 leading-tight font-bold"
@@ -95,9 +93,7 @@ const HeroSection = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.6 }}
-          >
-            T&C applied. Offer Valid till 19th February 21
-          </motion.p>
+          ></motion.p>
 
           <motion.button
             className="bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white font-['Cinzel'] font-medium px-12 py-4 rounded-full text-base tracking-wider transition-all shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95"
