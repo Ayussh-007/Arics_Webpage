@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
+import AboutUs from "./pages/AboutUs";
 import { CustomisationApp } from "./customisation";
 import ProductsPage from "./pages/ProductsPage";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -17,6 +18,8 @@ const App = () => {
         return <ProductsPage />;
       case "admin":
         return <AdminDashboard />;
+      case "about":
+        return <AboutUs />;
       case "home":
       default:
         return (

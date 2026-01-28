@@ -127,24 +127,14 @@ const Navbar = ({ currentPage, setCurrentPage }) => {
               ></span>
             </motion.button>
 
-            <motion.button
-              onClick={() => handleNavigation("admin")}
-              className={`font-['Cinzel'] text-sm tracking-widest transition-colors relative group ${
-                currentPage === "admin"
-                  ? "text-pink-600"
-                  : "text-pink-800 hover:text-pink-600"
-              }`}
+            <motion.a
+              href="#about"
+              className="text-pink-800 font-['Cinzel'] text-sm tracking-widest hover:text-pink-600 transition-colors relative group"
               whileHover={{ y: -2 }}
             >
-              ADMIN
-              <span
-                className={`absolute -bottom-1 left-0 h-0.5 bg-pink-600 transition-all duration-300 ${
-                  currentPage === "admin"
-                    ? "w-full"
-                    : "w-0 group-hover:w-full"
-                }`}
-              ></span>
-            </motion.button>
+              ABOUT US
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-pink-600 transition-all duration-300 group-hover:w-full"></span>
+            </motion.a>
           </div>
 
           {/* Mobile Menu Button */}
