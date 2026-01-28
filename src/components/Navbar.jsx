@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useCartStore } from "../store/useCartStore";
+import logoUrl from "../assets/logo.svg";
 
 const Navbar = ({ currentPage, setCurrentPage, showAdmin = false }) => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -16,6 +18,8 @@ const Navbar = ({ currentPage, setCurrentPage, showAdmin = false }) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const cartCount = useCartStore((s) => s.count())
 
   return (
     <motion.nav
@@ -37,34 +41,12 @@ const Navbar = ({ currentPage, setCurrentPage, showAdmin = false }) => {
             transition={{ duration: 0.2 }}
             onClick={() => handleNavigation("home")}
           >
-            <svg
-              width="36"
-              height="36"
-              viewBox="0 0 36 36"
-              fill="none"
-              className="text-pink-600"
-            >
-              <path
-                d="M18 5C18 5 13.5 9.5 13.5 14C13.5 16.4853 15.5147 18.5 18 18.5C20.4853 18.5 22.5 16.4853 22.5 14C22.5 9.5 18 5 18 5Z"
-                fill="currentColor"
-              />
-              <path
-                d="M11 16C11 16 9 18.5 9 20.5C9 21.8807 10.1193 23 11.5 23C12.8807 23 14 21.8807 14 20.5C14 18.5 11 16 11 16Z"
-                fill="currentColor"
-              />
-              <path
-                d="M25 16C25 16 23 18.5 23 20.5C23 21.8807 24.1193 23 25.5 23C26.8807 23 28 21.8807 28 20.5C28 18.5 25 16 25 16Z"
-                fill="currentColor"
-              />
-              <rect
-                x="16.5"
-                y="18"
-                width="3"
-                height="13"
-                rx="1.5"
-                fill="currentColor"
-              />
-            </svg>
+           
+            <img
+              src={logoUrl}
+              alt="Arics logo"
+              className="w-8 h-8 md:w-9 md:h-9 rounded-sm shadow-sm border border-pink-200 bg-white"
+            />
             <span className="text-3xl font-['Italiana'] text-pink-700 tracking-wide">
               Arics
             </span>
@@ -142,6 +124,27 @@ const Navbar = ({ currentPage, setCurrentPage, showAdmin = false }) => {
                   currentPage === "about" ? "w-full" : "w-0 group-hover:w-full"
                 }`}
               ></span>
+            </motion.button>
+
+            {/* Cart */}
+            <motion.button
+              onClick={() => handleNavigation("cart")}
+              className={`relative font-['Cinzel'] text-sm tracking-widest transition-colors group ${
+                currentPage === "cart" ? "text-pink-600" : "text-pink-800 hover:text-pink-600"
+              }`}
+              whileHover={{ y: -2 }}
+            >
+              CART
+              <span
+                className={`absolute -bottom-1 left-0 h-0.5 bg-pink-600 transition-all duration-300 ${
+                  currentPage === "cart" ? "w-full" : "w-0 group-hover:w-full"
+                }`}
+              ></span>
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-3 bg-rose-500 text-white text-xs rounded-full px-2 py-0.5">
+                  {cartCount}
+                </span>
+              )}
             </motion.button>
 
             {showAdmin && (

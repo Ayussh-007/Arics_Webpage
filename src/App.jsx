@@ -7,6 +7,8 @@ import AboutUs from "./pages/AboutUs";
 import { CustomisationApp } from "./customisation";
 import ProductsPage from "./pages/ProductsPage";
 import AdminPortal from "./pages/AdminPortal";
+import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
 import "./App.css";
 
 const ADMIN_UNLOCK_STORAGE_KEY = "arics_admin_unlocked";
@@ -52,6 +54,15 @@ const App = () => {
         );
       case "products":
         return <ProductsPage />;
+      case "cart":
+        return <CartPage onCheckout={() => setCurrentPage("checkout")} />;
+      case "checkout":
+        return (
+          <CheckoutPage
+            onBack={() => setCurrentPage("cart")}
+            onComplete={() => setCurrentPage("home")}
+          />
+        );
       case "admin":
         if (!adminUnlocked) {
           // Admin route is hidden unless unlocked via the secret key combo.

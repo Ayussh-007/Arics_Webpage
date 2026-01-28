@@ -44,7 +44,6 @@ const CustomisationApp = ({ onOpenAdmin }) => {
           <div className="flex flex-wrap gap-2">
             {[
               { id: 'builder', label: 'Builder' },
-              { id: 'checkout', label: 'Checkout' },
             ].map((item) => (
               <button
                 key={item.id}
@@ -72,19 +71,7 @@ const CustomisationApp = ({ onOpenAdmin }) => {
         </div>
 
         <div className="bg-white/80 border border-pink-200 rounded-2xl sm:rounded-[32px] p-4 sm:p-6 md:p-10 backdrop-blur-xl shadow-xl">
-          {view === 'builder' && <BouquetBuilder onCheckout={() => setView('checkout')} />}
-          {view === 'checkout' && (
-            <Checkout
-              flowers={flowers}
-              customizations={customizations}
-              settings={settings}
-              onBack={() => setView('builder')}
-              onComplete={() => setView('confirmation')}
-            />
-          )}
-          {view === 'confirmation' && (
-            <OrderConfirmation onNewOrder={() => setView('builder')} />
-          )}
+          {view === 'builder' && <BouquetBuilder />}
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ import api from '../../api/client'
 const STATUSES = [
   { id: 'pending', label: 'Pending', color: 'bg-amber-100 text-amber-800' },
   { id: 'confirmed', label: 'Confirmed', color: 'bg-blue-100 text-blue-800' },
+  { id: 'payment_received', label: 'Payment received', color: 'bg-emerald-100 text-emerald-800' },
   { id: 'preparing', label: 'Preparing', color: 'bg-purple-100 text-purple-800' },
   { id: 'out_for_delivery', label: 'Out for delivery', color: 'bg-pink-100 text-pink-800' },
   { id: 'delivered', label: 'Delivered', color: 'bg-green-100 text-green-800' },

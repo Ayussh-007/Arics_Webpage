@@ -5,11 +5,13 @@ import toast from 'react-hot-toast'
 import BloomAnimation from '../components/Bloomanimation'
 import OrdersAdmin from '../components/admin/OrdersAdmin'
 import ProductsAdmin from './AdminDashboard'
+import CustomAdmin from '../customisation/pages/AdminDashboard'
 import api from '../api/client'
 
 const TABS = [
   { id: 'orders', label: 'Orders' },
   { id: 'products', label: 'Products' },
+  { id: 'customs', label: 'Customizations' },
 ]
 
 const AdminPortal = ({ onExit }) => {
@@ -202,8 +204,21 @@ const AdminPortal = ({ onExit }) => {
                   exit={{ opacity: 0, y: 10 }}
                   transition={{ duration: 0.2 }}
                 >
-                  {/* Existing products admin (reused) */}
+                  {/* Products admin (existing) */}
                   <ProductsAdmin embedded />
+                </motion.div>
+              )}
+
+              {tab === 'customs' && (
+                <motion.div
+                  key="customs"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {/* Customization admin (flowers + customizations) */}
+                  <CustomAdmin visibleTabs={['customizations','flowers','settings']} initialTab="customizations" />
                 </motion.div>
               )}
             </AnimatePresence>

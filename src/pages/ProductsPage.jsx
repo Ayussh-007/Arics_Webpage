@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "../components/ProductCard";
+import { useCartStore } from "../store/useCartStore";
+import toast from "react-hot-toast";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
@@ -9,6 +11,8 @@ const ProductsPage = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState("createdAt");
+  const [selected, setSelected] = useState(null);
+  const addItem = useCartStore((s) => s.addItem);
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterOffers, setFilterOffers] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -60,8 +64,7 @@ const ProductsPage = () => {
   }, [searchQuery, products]);
 
   const handleViewDetails = (product) => {
-    console.log("View details:", product);
-    // Navigate to product details page or open modal
+    setSelected(product);
   };
 
   const handleCustomize = (product) => {
@@ -70,17 +73,23 @@ const ProductsPage = () => {
   };
 
   const handleAddToCart = async (product) => {
-    // Increment popularity
     try {
-      await fetch(`${API_BASE_URL}/products/${product._id}/view`, {
-        method: "POST",
-      });
-    } catch (error) {
-      console.error("Error updating popularity:", error);
-    }
-    
-    console.log("Add to cart:", product);
-    // Add to cart logic
+      // Optional popularity bump
+      fetch(`${API_BASE_URL}/products/${product._id}/view`, { method: "POST" }).catch(() => {})
+    } catch {}
+
+    const price = product.discountedPrice || product.originalPrice || 0
+    addItem({
+      id: `product:${product._id}`,
+      type: 'product',
+      refId: product._id,
+      name: product.name,
+      price: Number(price),
+      image: product.image,
+      quantity: 1,
+      meta: { category: product.category },
+    })
+    toast.success('Added to cart')
   };
 
   const categories = [
@@ -326,6 +335,37 @@ const ProductsPage = () => {
           ease: "easeInOut",
         }}
       />
+      {/* Details Modal */}
+      {selected && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden">
+            <div className="grid md:grid-cols-2">
+              <div className="h-64 md:h-full bg-rose-50">
+                <img src={selected.image} alt={selected.name} className="w-full h-full object-cover" />
+              </div>
+              <div className="p-6 space-y-3">
+                <h3 className="text-2xl font-['Playfair_Display'] text-gray-900">{selected.name}</h3>
+                <p className="text-gray-700 font-['Cormorant_Garamond']">{selected.description}</p>
+                <div className="text-xl font-['Playfair_Display']">${(selected.discountedPrice || selected.originalPrice || 0).toFixed(2)}</div>
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={() => { handleAddToCart(selected); setSelected(null); }}
+                    className="px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-['Cinzel'] text-sm tracking-widest"
+                  >
+                    Add to Cart
+                  </button>
+                  <button
+                    onClick={() => setSelected(null)}
+                    className="px-6 py-3 rounded-full bg-white border border-pink-200 text-pink-800 font-['Cinzel'] text-sm tracking-widest"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

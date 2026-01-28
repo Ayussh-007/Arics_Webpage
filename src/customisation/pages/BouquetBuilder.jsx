@@ -11,6 +11,7 @@ import BouquetPreview from '../components/BouquetPreview'
 import { useBouquetStore } from '../store/useBouquetStore'
 import { computePricing, estimateDelivery } from '../utils/pricing'
 import { fetchCustomizations, fetchFlowers, fetchSettings } from '../api/services'
+import { useCartStore } from '../../store/useCartStore'
 
 // Default fallback data
 const DEFAULT_FLOWERS = [
@@ -99,7 +100,7 @@ const DEFAULT_SETTINGS = {
   }
 }
 
-const BouquetBuilder = ({ onCheckout }) => {
+const BouquetBuilder = () => {
   const { step, setStep, selection, setQuantity, setFlowerStem, toggleCustomization } =
     useBouquetStore()
   const [flowers, setFlowers] = useState([])
@@ -152,6 +153,22 @@ const BouquetBuilder = ({ onCheckout }) => {
     () => computePricing({ selection, flowers, customizations, settings }),
     [selection, flowers, customizations, settings],
   )
+  const addItem = useCartStore((s) => s.addItem)
+
+  const addCurrentDesignToCart = () => {
+    const unit = Number((pricing.base || 0) + (pricing.addOns || 0))
+    const id = `custom:${Math.random().toString(36).slice(2)}`
+    addItem({
+      id,
+      type: 'custom',
+      name: `Custom Bouquet (${selection.quantity} flowers)`,
+      price: unit,
+      image: (flowers.find((f) => selection.flowers?.[f._id] > 0) || {}).image,
+      quantity: 1,
+      meta: { selection },
+    })
+    toast.success('Custom bouquet added to cart')
+  }
   const deliveryDays = estimateDelivery({ quantity: selection.quantity, settings })
 
   const handleCustomQuantityClick = () => {
@@ -343,10 +360,10 @@ const BouquetBuilder = ({ onCheckout }) => {
                   Back
                 </button>
                 <button
+                  onClick={addCurrentDesignToCart}
                   className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-full bg-pink-600 text-white font-['Cinzel'] tracking-wider hover:bg-pink-700 transition-colors shadow-lg"
-                  onClick={() => onCheckout()}
                 >
-                  Proceed to Checkout
+                  Add to Cart
                 </button>
               </div>
             </motion.div>

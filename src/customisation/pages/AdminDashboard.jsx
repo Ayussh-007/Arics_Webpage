@@ -17,8 +17,9 @@ import {
   updateSettings,
 } from '../api/services'
 
-const AdminDashboard = ({ onBack }) => {
-  const [tab, setTab] = useState('orders')
+const AdminDashboard = ({ onBack, visibleTabs, initialTab }) => {
+  const tabs = visibleTabs && visibleTabs.length ? visibleTabs : ['orders', 'flowers', 'customizations', 'settings']
+  const [tab, setTab] = useState(() => (initialTab && tabs.includes(initialTab) ? initialTab : tabs[0]))
   const [flowers, setFlowers] = useState([])
   const [customizations, setCustomizations] = useState([])
   const [orders, setOrders] = useState([])
@@ -186,7 +187,7 @@ const AdminDashboard = ({ onBack }) => {
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
-          {['orders', 'flowers', 'customizations', 'settings'].map((t) => (
+          {tabs.map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
