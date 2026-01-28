@@ -91,7 +91,7 @@ const Navbar = ({ currentPage, setCurrentPage }) => {
 
             <motion.div className="relative group" whileHover={{ y: -2 }}>
               <button className="flex items-center gap-2 text-pink-800 font-['Cinzel'] text-sm tracking-widest hover:text-pink-600 transition-colors">
-                OCCASIONS
+                OUR PRODUCTS
                 <svg
                   width="14"
                   height="14"
@@ -130,11 +130,11 @@ const Navbar = ({ currentPage, setCurrentPage }) => {
             </motion.button>
 
             <motion.a
-              href="#contact"
+              href="#about"
               className="text-pink-800 font-['Cinzel'] text-sm tracking-widest hover:text-pink-600 transition-colors relative group"
               whileHover={{ y: -2 }}
             >
-              CONTACT US
+              ABOUT US
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-pink-600 transition-all duration-300 group-hover:w-full"></span>
             </motion.a>
           </div>
