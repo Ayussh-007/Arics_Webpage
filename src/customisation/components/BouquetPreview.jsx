@@ -21,13 +21,13 @@ const BouquetPreview = ({ selection, flowers, customizations }) => {
 
   return (
     <GlassCard className="p-6 space-y-4">
-      <h3 className="text-xl font-['Playfair_Display']">Live Preview</h3>
-      <div className="h-40 rounded-xl bg-gradient-to-br from-rose-100 via-pink-100 to-white border border-white/60 flex items-center justify-center text-slate-500 text-sm">
+      <h3 className="text-xl font-['Italiana'] text-pink-700">Live Preview</h3>
+      <div className="h-40 rounded-xl bg-gradient-to-br from-rose-100 via-pink-100 to-white border border-pink-200 flex items-center justify-center text-pink-600 text-sm font-['Cinzel']">
         Bouquet Preview Placeholder
       </div>
-      <div className="space-y-2 text-sm text-slate-700">
+      <div className="space-y-2 text-sm text-pink-800">
         <div>
-          <p className="font-semibold text-slate-900">Flowers</p>
+          <p className="font-semibold text-pink-900 font-['Cinzel']">Flowers</p>
           {selectedFlowers.length ? (
             <ul className="list-disc list-inside">
               {selectedFlowers.map((item) => (
@@ -35,11 +35,11 @@ const BouquetPreview = ({ selection, flowers, customizations }) => {
               ))}
             </ul>
           ) : (
-            <p className="text-slate-500">No flowers selected yet.</p>
+            <p className="text-pink-600">No flowers selected yet.</p>
           )}
         </div>
         <div>
-          <p className="font-semibold text-slate-900">Wrap & Add-ons</p>
+          <p className="font-semibold text-pink-900 font-['Cinzel']">Wrap & Add-ons</p>
           {selectedCustoms.length ? (
             <ul className="list-disc list-inside">
               {selectedCustoms.map((item) => (
@@ -47,7 +47,7 @@ const BouquetPreview = ({ selection, flowers, customizations }) => {
               ))}
             </ul>
           ) : (
-            <p className="text-slate-500">No options selected yet.</p>
+            <p className="text-pink-600">No options selected yet.</p>
           )}
         </div>
       </div>

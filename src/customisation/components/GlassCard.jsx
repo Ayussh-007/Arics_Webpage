@@ -5,7 +5,7 @@ const GlassCard = ({ className, children }) => {
   return (
     <div
       className={clsx(
-        'bg-white/20 border border-white/30 backdrop-blur-xl shadow-[0_20px_60px_rgba(236,72,153,0.15)] rounded-2xl',
+        'bg-white/70 border border-pink-200 backdrop-blur-xl shadow-lg rounded-2xl',
         className,
       )}
     >

@@ -7,10 +7,10 @@ const OptionPill = ({ label, active, onClick }) => {
       type="button"
       onClick={onClick}
       className={clsx(
-        'px-4 py-2 rounded-full border text-sm transition-all',
+        'px-4 py-2 rounded-full border text-sm transition-all font-["Cinzel"] tracking-wide',
         active
-          ? 'bg-pink-500 text-white border-pink-400 shadow-lg'
-          : 'bg-white/70 text-slate-700 border-white/60 hover:bg-white',
+          ? 'bg-pink-600 text-white border-pink-500 shadow-lg'
+          : 'bg-white text-pink-800 border-pink-300 hover:bg-pink-50',
       )}
     >
       {label}

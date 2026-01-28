@@ -92,45 +92,49 @@ const Checkout = ({ flowers, customizations, settings, onBack, onComplete }) => 
   return (
     <div className="grid lg:grid-cols-[2fr_1fr] gap-8">
       <GlassCard className="p-6 space-y-6">
-        <h3 className="text-2xl font-['Playfair_Display']">Checkout</h3>
+        <h3 className="text-2xl font-['Italiana'] text-pink-700">Checkout</h3>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="text-sm text-slate-600">Full Name</label>
+            <label className="text-sm text-pink-800 font-['Cinzel']">Full Name</label>
             <input
               {...register('name')}
-              className="w-full mt-1 px-4 py-2 rounded-xl bg-white/80"
+              className="w-full mt-1 px-4 py-2 rounded-xl bg-white border border-pink-300 text-pink-900 focus:outline-none focus:ring-2 focus:ring-pink-500"
+              placeholder="John Doe"
             />
             {errors.name && <p className="text-xs text-rose-500">{errors.name.message}</p>}
           </div>
           <div>
-            <label className="text-sm text-slate-600">Phone</label>
+            <label className="text-sm text-pink-800 font-['Cinzel']">Phone</label>
             <input
               {...register('phone')}
-              className="w-full mt-1 px-4 py-2 rounded-xl bg-white/80"
+              className="w-full mt-1 px-4 py-2 rounded-xl bg-white border border-pink-300 text-pink-900 focus:outline-none focus:ring-2 focus:ring-pink-500"
+              placeholder="+91 98765 43210"
             />
             {errors.phone && <p className="text-xs text-rose-500">{errors.phone.message}</p>}
           </div>
           <div>
-            <label className="text-sm text-slate-600">Email</label>
+            <label className="text-sm text-pink-800 font-['Cinzel']">Email</label>
             <input
               {...register('email')}
-              className="w-full mt-1 px-4 py-2 rounded-xl bg-white/80"
+              className="w-full mt-1 px-4 py-2 rounded-xl bg-white border border-pink-300 text-pink-900 focus:outline-none focus:ring-2 focus:ring-pink-500"
+              placeholder="john@example.com"
             />
             {errors.email && <p className="text-xs text-rose-500">{errors.email.message}</p>}
           </div>
           <div>
-            <label className="text-sm text-slate-600">Address</label>
+            <label className="text-sm text-pink-800 font-['Cinzel']">Address</label>
             <textarea
               {...register('address')}
-              className="w-full mt-1 px-4 py-2 rounded-xl bg-white/80"
+              className="w-full mt-1 px-4 py-2 rounded-xl bg-white border border-pink-300 text-pink-900 focus:outline-none focus:ring-2 focus:ring-pink-500"
               rows={3}
+              placeholder="Enter your delivery address"
             />
             {errors.address && <p className="text-xs text-rose-500">{errors.address.message}</p>}
           </div>
           <div className="flex gap-3">
             <button
               type="button"
-              className="px-6 py-3 rounded-full bg-white/80 text-slate-700"
+              className="px-6 py-3 rounded-full bg-white border border-pink-300 text-pink-700 font-['Cinzel'] text-sm tracking-wider hover:bg-pink-50 transition-colors"
               onClick={onBack}
             >
               Back
@@ -138,7 +142,7 @@ const Checkout = ({ flowers, customizations, settings, onBack, onComplete }) => 
             <button
               type="submit"
               disabled={submitting}
-              className="px-6 py-3 rounded-full bg-pink-600 text-white shadow-lg"
+              className="px-6 py-3 rounded-full bg-pink-600 text-white shadow-lg font-['Cinzel'] text-sm tracking-wider hover:bg-pink-700 transition-colors disabled:opacity-50"
             >
               {submitting ? 'Placing...' : 'Place Order'}
             </button>
@@ -148,8 +152,9 @@ const Checkout = ({ flowers, customizations, settings, onBack, onComplete }) => 
 
       <div className="space-y-6">
         <PriceSummary pricing={pricing} deliveryDays={deliveryDays} />
-        <GlassCard className="p-6 text-sm text-slate-600">
-          Payment method placeholder. Add your gateway later.
+        <GlassCard className="p-6 text-sm text-pink-800">
+          <p className="font-['Cinzel'] text-pink-900 mb-2">Payment Information</p>
+          <p>Payment gateway integration coming soon. For now, payment will be collected on delivery.</p>
         </GlassCard>
       </div>
     </div>

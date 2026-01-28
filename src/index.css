@@ -9,3 +9,34 @@
     --color-purple-accent: #c084fc;
   }
 }
+
+/* Custom range slider styling */
+input[type="range"].slider-thumb::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: rgb(219 39 119);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input[type="range"].slider-thumb::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: rgb(219 39 119);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input[type="range"].slider-thumb::-webkit-slider-thumb:hover {
+  background: rgb(190 24 93);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+input[type="range"].slider-thumb::-moz-range-thumb:hover {
+  background: rgb(190 24 93);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}

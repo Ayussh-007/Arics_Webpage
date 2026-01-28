@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-const Navbar = () => {
+const Navbar = ({ currentPage, setCurrentPage }) => {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -11,6 +11,11 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleNavigation = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <motion.nav
@@ -27,9 +32,10 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <motion.div
-            className="flex items-center gap-3"
+            className="flex items-center gap-3 cursor-pointer"
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.2 }}
+            onClick={() => handleNavigation("home")}
           >
             <svg
               width="36"
@@ -66,14 +72,22 @@ const Navbar = () => {
 
           {/* Navigation Menu - Desktop */}
           <div className="hidden md:flex items-center gap-10">
-            <motion.a
-              href="#home"
-              className="text-pink-800 font-['Cinzel'] text-sm tracking-widest hover:text-pink-600 transition-colors relative group"
+            <motion.button
+              onClick={() => handleNavigation("home")}
+              className={`font-['Cinzel'] text-sm tracking-widest transition-colors relative group ${
+                currentPage === "home"
+                  ? "text-pink-600"
+                  : "text-pink-800 hover:text-pink-600"
+              }`}
               whileHover={{ y: -2 }}
             >
               HOME
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-pink-600 transition-all duration-300 group-hover:w-full"></span>
-            </motion.a>
+              <span
+                className={`absolute -bottom-1 left-0 h-0.5 bg-pink-600 transition-all duration-300 ${
+                  currentPage === "home" ? "w-full" : "w-0 group-hover:w-full"
+                }`}
+              ></span>
+            </motion.button>
 
             <motion.div className="relative group" whileHover={{ y: -2 }}>
               <button className="flex items-center gap-2 text-pink-800 font-['Cinzel'] text-sm tracking-widest hover:text-pink-600 transition-colors">
@@ -96,14 +110,24 @@ const Navbar = () => {
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-pink-600 transition-all duration-300 group-hover:w-full"></span>
             </motion.div>
 
-            <motion.a
-              href="#customize"
-              className="text-pink-800 font-['Cinzel'] text-sm tracking-widest hover:text-pink-600 transition-colors relative group"
+            <motion.button
+              onClick={() => handleNavigation("customize")}
+              className={`font-['Cinzel'] text-sm tracking-widest transition-colors relative group ${
+                currentPage === "customize"
+                  ? "text-pink-600"
+                  : "text-pink-800 hover:text-pink-600"
+              }`}
               whileHover={{ y: -2 }}
             >
               CUSTOMIZE
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-pink-600 transition-all duration-300 group-hover:w-full"></span>
-            </motion.a>
+              <span
+                className={`absolute -bottom-1 left-0 h-0.5 bg-pink-600 transition-all duration-300 ${
+                  currentPage === "customize"
+                    ? "w-full"
+                    : "w-0 group-hover:w-full"
+                }`}
+              ></span>
+            </motion.button>
 
             <motion.a
               href="#contact"
