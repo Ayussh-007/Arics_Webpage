@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
+import ScrollBloomSection from "./components/ScrollBloomSection";
 import AboutUs from "./pages/AboutUs";
 import { CustomisationApp } from "./customisation";
 import "./App.css";
@@ -20,14 +21,8 @@ const App = () => {
           <>
             <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
             <HeroSection />
-            {/* Extra scroll space to demonstrate bloom animation */}
-            <section className="h-screen bg-gradient-to-b from-pink-50 to-rose-100 flex items-center justify-center">
-              <div className="text-center text-gray-600">
-                <p className="text-xl font-['Cormorant_Garamond'] italic">
-                  Scroll to see the bloom effect
-                </p>
-              </div>
-            </section>
+            {/* Scroll-controlled bloom animation */}
+            <ScrollBloomSection />
           </>
         );
     }
