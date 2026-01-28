@@ -31,14 +31,13 @@ const CustomisationApp = () => {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#14030a] via-[#2b0b1b] to-[#4a1430] text-white">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
       <Toaster position="top-right" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.15),_transparent_55%)]" />
       <div className="relative max-w-6xl mx-auto px-6 py-12 space-y-10">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="uppercase tracking-[0.3em] text-xs text-rose-200">Arics Atelier</p>
-            <h1 className="text-4xl md:text-5xl font-['Playfair_Display']">
+            <p className="uppercase tracking-[0.3em] text-xs text-rose-600 font-['Cinzel']">Arics Atelier</p>
+            <h1 className="text-4xl md:text-5xl font-['Italiana'] text-pink-700">
               Custom Bouquet Builder
             </h1>
           </div>
@@ -51,10 +50,10 @@ const CustomisationApp = () => {
               <button
                 key={item.id}
                 onClick={() => setView(item.id)}
-                className={`px-4 py-2 rounded-full border ${
+                className={`px-4 py-2 rounded-full border font-['Cinzel'] text-sm tracking-wider transition-all ${
                   view === item.id
-                    ? 'bg-rose-500/80 border-rose-300'
-                    : 'bg-white/10 border-white/20'
+                    ? 'bg-pink-600 border-pink-500 text-white shadow-lg'
+                    : 'bg-white/80 border-pink-200 text-pink-800 hover:bg-white'
                 }`}
               >
                 {item.label}
@@ -63,7 +62,7 @@ const CustomisationApp = () => {
           </div>
         </div>
 
-        <div className="bg-white/10 border border-white/20 rounded-[32px] p-6 md:p-10 backdrop-blur-2xl">
+        <div className="bg-white/80 border border-pink-200 rounded-[32px] p-6 md:p-10 backdrop-blur-xl shadow-xl">
           {view === 'builder' && <BouquetBuilder onCheckout={() => setView('checkout')} />}
           {view === 'checkout' && (
             <Checkout

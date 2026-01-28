@@ -15,8 +15,8 @@ const Stepper = ({ step }) => {
             className={clsx(
               "px-4 py-2 rounded-full text-xs tracking-widest font-['Cinzel']",
               done || active
-                ? 'bg-pink-500 text-white shadow-lg'
-                : 'bg-white/60 text-slate-600 border border-white',
+                ? 'bg-pink-600 text-white shadow-lg'
+                : 'bg-white text-pink-700 border border-pink-300',
             )}
           >
             {label}
