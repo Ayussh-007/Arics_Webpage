@@ -1,5 +1,8 @@
 import QRCode from 'qrcode'
 import { sendMail } from '../lib/mailer.js'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const money = (v) => Number(v || 0).toFixed(2)
 
@@ -48,95 +51,236 @@ export const generatePaymentQrPng = async (order) => {
   })
 }
 
+const getQrFromAssets = async () => {
+  const __filename = fileURLToPath(import.meta.url)
+  const __dirname = path.dirname(__filename)
+  // Look for qr.png in server/src/assets folder
+  const qrPath = path.join(__dirname, '../assets/qr.png')
+  if (fs.existsSync(qrPath)) {
+    return fs.readFileSync(qrPath)
+  }
+  // If no asset file exists, generate a default QR
+  return QRCode.toBuffer(process.env.PAYMENT_QR_PAYLOAD || 'upi://pay?pa=arics@upi&pn=Arics', {
+    type: 'png',
+    width: 340,
+    margin: 1,
+    color: { dark: '#be185d', light: '#ffffff' },
+  })
+}
+
 export const sendOrderConfirmedEmail = async (order) => {
   const to = order.customer?.email
-  if (!to) throw new Error('Order has no customer email')
-
+  if (!to) return
   const from = process.env.MAIL_FROM || 'Arics <no-reply@arics.com>'
   const shortId = String(order._id).slice(-6).toUpperCase()
-
-  const subject = `Your Arics order is confirmed (#${shortId})`
-  const customerName = order.customer?.name || 'there'
-
-  const flowersHtml = (order.selection?.flowers || [])
-    .map((f) => `<li>${f.name || 'Flower'} × ${Number(f.stems || 0)} <span style="color:#6b7280">(₹${money(Number(f.stems || 0) * Number(f.pricePerStem || 0))})</span></li>`)
-    .join('')
-
-  const customHtml = (order.selection?.customizations || [])
-    .map((c) => `<li>${c.option || c.category || 'Customization'}${c.quantity ? ` × ${c.quantity}` : ''} <span style="color:#6b7280">(₹${money(Number(c.price || 0) * Number(c.quantity || 1))})</span></li>`)
-    .join('')
+  
+  // Use hosted QR URL for maximum compatibility
+  const qrUrl = 'https://i.ibb.co/tMsXbdc/qr.png'
 
   const html = `
-  <div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; line-height: 1.5; color: #111827;">
-    <div style="max-width: 640px; margin: 0 auto; padding: 24px;">
-      <div style="padding: 18px 20px; border-radius: 18px; background: linear-gradient(135deg, #fff1f2, #fdf2f8, #f5f3ff); border: 1px solid rgba(236, 72, 153, 0.20);">
-        <div style="font-size: 12px; letter-spacing: 0.25em; text-transform: uppercase; color: #be185d; font-weight: 700;">Arics</div>
-        <div style="font-size: 28px; font-weight: 800; margin-top: 6px;">Order Confirmed</div>
-        <p style="margin: 10px 0 0; color: #374151;">Hi ${customerName}, your bouquet is being prepared. Below are your order details.</p>
-      </div>
-
-      <div style="margin-top: 18px; padding: 18px 20px; border-radius: 18px; background: rgba(255,255,255,0.9); border: 1px solid rgba(236, 72, 153, 0.18);">
-        <div style="display:flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-          <div>
-            <div style="font-size: 12px; color: #9ca3af;">Order ID</div>
-            <div style="font-weight: 800; color: #111827;">#${shortId}</div>
-          </div>
-          <div>
-            <div style="font-size: 12px; color: #9ca3af;">Estimated delivery</div>
-            <div style="font-weight: 700; color: #111827;">${order.deliveryEstimate?.startDate || ''} ${order.deliveryEstimate?.endDate ? `→ ${order.deliveryEstimate.endDate}` : ''}</div>
-          </div>
-          <div>
-            <div style="font-size: 12px; color: #9ca3af;">Total</div>
-            <div style="font-weight: 800; color: #111827;">₹${money(order.pricing?.total)}</div>
-          </div>
-        </div>
-
-        <hr style="border:0; border-top:1px solid rgba(236, 72, 153, 0.16); margin: 16px 0;" />
-
-        <div style="display:grid; grid-template-columns: 1fr; gap: 14px;">
-          <div>
-            <div style="font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color:#be185d; font-weight:700;">Flowers</div>
-            <ul style="margin: 8px 0 0; padding-left: 18px; color:#111827;">
-              ${flowersHtml || '<li>—</li>'}
-            </ul>
-          </div>
-          <div>
-            <div style="font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color:#be185d; font-weight:700;">Customizations</div>
-            <ul style="margin: 8px 0 0; padding-left: 18px; color:#111827;">
-              ${customHtml || '<li>—</li>'}
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-top: 18px; padding: 18px 20px; border-radius: 18px; background: rgba(255,255,255,0.9); border: 1px solid rgba(236, 72, 153, 0.18);">
-        <div style="font-size: 14px; font-weight: 800;">Payment</div>
-        <p style="margin: 6px 0 0; color:#374151;">Scan the QR code below to complete payment.</p>
-        <div style="margin-top: 12px; text-align:center;">
-          <img src="cid:paymentqr" width="260" height="260" alt="Payment QR Code" style="border-radius: 14px; border: 1px solid rgba(236, 72, 153, 0.20);" />
-        </div>
-        <p style="margin: 12px 0 0; color:#6b7280; font-size: 12px;">If you have questions, reply to this email.</p>
-      </div>
-
-      <p style="margin-top: 18px; color:#6b7280; font-size: 12px; text-align:center;">Thank you for choosing Arics.</p>
+  <div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; line-height: 1.5; color: #111827; max-width:640px; margin:0 auto; padding:18px;">
+    <div style="padding:16px; border:1px solid rgba(236,72,153,0.2); border-radius:14px; background:linear-gradient(135deg,#fff1f2,#fdf2f8,#f5f3ff)">
+      <div style="font-size:12px; letter-spacing:0.25em; text-transform:uppercase; color:#be185d; font-weight:700;">Arics</div>
+      <div style="font-size:24px; font-weight:800; margin-top:6px;">Order Confirmed</div>
+      <p style="margin:8px 0 0; color:#374151;">Order <strong>#${shortId}</strong></p>
+      <p style="margin:6px 0 0; color:#374151;">Thank you for your order! We've received it and will begin preparing your beautiful bouquet.</p>
     </div>
-  </div>
-  `
+    <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
+      <div style="font-size:14px; font-weight:800;">Order Details</div>
+      <p style="margin:6px 0 0; color:#374151;"><strong>Total:</strong> ₹${(order.pricing?.total || 0).toFixed(2)}</p>
+      <p style="margin:6px 0 0; color:#374151;"><strong>Delivery:</strong> ${order.deliveryEstimate || 'To be confirmed'}</p>
+    </div>
+    <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
+      <div style="font-size:14px; font-weight:800;">Payment</div>
+      <p style="margin:6px 0 0; color:#374151;">Scan the QR code below to complete your payment.</p>
+      <div style="margin-top:10px; text-align:center;"><img src="${qrUrl}" width="220" height="220" alt="Payment QR" style="border-radius:12px; border:1px solid rgba(236,72,153,0.18)"/></div>
+    </div>
+  </div>`
 
-  const qrPng = await generatePaymentQrPng(order)
+  // Send without attachment for better compatibility
+  await sendMail({ from, to, subject: `Arics • Order Confirmed (#${shortId})`, html })
+}
 
-  await sendMail({
-    from,
-    to,
-    subject,
-    html,
-    attachments: [
-      {
-        filename: `arics-payment-qr-${shortId}.png`,
-        content: qrPng,
-        cid: 'paymentqr',
-        contentType: 'image/png',
-      },
-    ],
-  })
+export const sendStatusEmail = async (order, status) => {
+  const to = order.customer?.email
+  if (!to) return
+  const from = process.env.MAIL_FROM || 'Arics <no-reply@arics.com>'
+  const shortId = String(order._id).slice(-6).toUpperCase()
+  const total = (order.pricing?.total || 0).toFixed(2)
+  
+  // Use hosted QR URL for maximum compatibility
+  const qrUrl = 'https://i.ibb.co/tMsXbdc/qr.png'
+
+  // Email templates for each status
+  const emailTemplates = {
+    pending: {
+      title: 'Order Received',
+      subject: `Order Received (#${shortId})`,
+      content: `
+        <div style="padding:16px; border:1px solid rgba(236,72,153,0.2); border-radius:14px; background:linear-gradient(135deg,#fff1f2,#fdf2f8,#f5f3ff)">
+          <div style="font-size:12px; letter-spacing:0.25em; text-transform:uppercase; color:#be185d; font-weight:700;">Arics</div>
+          <div style="font-size:24px; font-weight:800; margin-top:6px;">Order Received! 🌸</div>
+          <p style="margin:8px 0 0; color:#374151;">Order <strong>#${shortId}</strong></p>
+          <p style="margin:6px 0 0; color:#374151;">Thank you for choosing Arics! We've received your order and will review it shortly.</p>
+        </div>
+        <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
+          <div style="font-size:14px; font-weight:800;">Order Summary</div>
+          <p style="margin:6px 0 0; color:#374151;"><strong>Total:</strong> ₹${total}</p>
+          <p style="margin:6px 0 0; color:#374151;"><strong>Status:</strong> Pending Review</p>
+          <p style="margin:10px 0 0; color:#6b7280; font-size:13px;">We'll send you a confirmation email once your order is confirmed.</p>
+        </div>
+      `,
+      includeQr: false
+    },
+    confirmed: {
+      title: 'Order Confirmed',
+      subject: `Order Confirmed (#${shortId})`,
+      content: `
+        <div style="padding:16px; border:1px solid rgba(236,72,153,0.2); border-radius:14px; background:linear-gradient(135deg,#fff1f2,#fdf2f8,#f5f3ff)">
+          <div style="font-size:12px; letter-spacing:0.25em; text-transform:uppercase; color:#be185d; font-weight:700;">Arics</div>
+          <div style="font-size:24px; font-weight:800; margin-top:6px;">Order Confirmed! ✨</div>
+          <p style="margin:8px 0 0; color:#374151;">Order <strong>#${shortId}</strong></p>
+          <p style="margin:6px 0 0; color:#374151;">Your order is confirmed and scheduled for preparation!</p>
+        </div>
+        <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
+          <div style="font-size:14px; font-weight:800;">Order Details</div>
+          <p style="margin:6px 0 0; color:#374151;"><strong>Total:</strong> ₹${total}</p>
+          <p style="margin:6px 0 0; color:#374151;"><strong>Delivery:</strong> ${order.deliveryEstimate || 'To be confirmed'}</p>
+        </div>
+        <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
+          <div style="font-size:14px; font-weight:800;">💳 Payment Required</div>
+          <p style="margin:6px 0 0; color:#374151;">Please scan the QR code below to complete your payment.</p>
+          <div style="margin-top:10px; text-align:center;"><img src="${qrUrl}" width="220" height="220" alt="Payment QR" style="border-radius:12px; border:1px solid rgba(236,72,153,0.18)"/></div>
+        </div>
+      `,
+      includeQr: false
+    },
+    payment_received: {
+      title: 'Payment Received',
+      subject: `Payment Received - Thank You! (#${shortId})`,
+      content: `
+        <div style="padding:16px; border:1px solid rgba(236,72,153,0.2); border-radius:14px; background:linear-gradient(135deg,#fff1f2,#fdf2f8,#f5f3ff)">
+          <div style="font-size:12px; letter-spacing:0.25em; text-transform:uppercase; color:#be185d; font-weight:700;">Arics</div>
+          <div style="font-size:24px; font-weight:800; margin-top:6px;">Payment Received! 💝</div>
+          <p style="margin:8px 0 0; color:#374151;">Order <strong>#${shortId}</strong></p>
+          <p style="margin:6px 0 0; color:#374151;">We've received your payment of <strong>₹${total}</strong>. Thank you!</p>
+        </div>
+        <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
+          <div style="font-size:14px; font-weight:800;">What's Next?</div>
+          <p style="margin:6px 0 0; color:#374151;">Our expert florists will now begin preparing your beautiful bouquet with the utmost care.</p>
+          <p style="margin:6px 0 0; color:#374151;">Expected delivery: <strong>${order.deliveryEstimate || 'Soon'}</strong></p>
+        </div>
+      `,
+      includeQr: false
+    },
+    preparing: {
+      title: 'Preparing Your Order',
+      subject: `Your Bouquet is Being Prepared (#${shortId})`,
+      content: `
+        <div style="padding:16px; border:1px solid rgba(236,72,153,0.2); border-radius:14px; background:linear-gradient(135deg,#fff1f2,#fdf2f8,#f5f3ff)">
+          <div style="font-size:12px; letter-spacing:0.25em; text-transform:uppercase; color:#be185d; font-weight:700;">Arics</div>
+          <div style="font-size:24px; font-weight:800; margin-top:6px;">Crafting Your Bouquet 🌹</div>
+          <p style="margin:8px 0 0; color:#374151;">Order <strong>#${shortId}</strong></p>
+          <p style="margin:6px 0 0; color:#374151;">Our talented florists are carefully arranging your flowers!</p>
+        </div>
+        <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
+          <div style="font-size:14px; font-weight:800;">🎨 In Progress</div>
+          <p style="margin:6px 0 0; color:#374151;">Each stem is being selected and arranged with love and expertise.</p>
+          <p style="margin:6px 0 0; color:#374151;">Your bouquet will be ready for delivery soon!</p>
+        </div>
+      `,
+      includeQr: false
+    },
+    out_for_delivery: {
+      title: 'Out for Delivery',
+      subject: `Your Flowers Are On The Way! (#${shortId})`,
+      content: `
+        <div style="padding:16px; border:1px solid rgba(236,72,153,0.2); border-radius:14px; background:linear-gradient(135deg,#fff1f2,#fdf2f8,#f5f3ff)">
+          <div style="font-size:12px; letter-spacing:0.25em; text-transform:uppercase; color:#be185d; font-weight:700;">Arics</div>
+          <div style="font-size:24px; font-weight:800; margin-top:6px;">Out for Delivery! 🚚</div>
+          <p style="margin:8px 0 0; color:#374151;">Order <strong>#${shortId}</strong></p>
+          <p style="margin:6px 0 0; color:#374151;">Your beautiful bouquet is on its way to you!</p>
+        </div>
+        <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
+          <div style="font-size:14px; font-weight:800;">📦 Delivery in Progress</div>
+          <p style="margin:6px 0 0; color:#374151;">Your flowers are being carefully transported to ensure they arrive fresh and beautiful.</p>
+          <p style="margin:6px 0 0; color:#374151;"><strong>Delivery to:</strong> ${order.customer?.name || 'You'}</p>
+          <p style="margin:6px 0 0; color:#374151;"><strong>Address:</strong> ${order.customer?.address || 'Your address'}</p>
+        </div>
+      `,
+      includeQr: false
+    },
+    delivered: {
+      title: 'Delivered',
+      subject: `Your Order Has Been Delivered! (#${shortId})`,
+      content: `
+        <div style="padding:16px; border:1px solid rgba(236,72,153,0.2); border-radius:14px; background:linear-gradient(135deg,#fff1f2,#fdf2f8,#f5f3ff)">
+          <div style="font-size:12px; letter-spacing:0.25em; text-transform:uppercase; color:#be185d; font-weight:700;">Arics</div>
+          <div style="font-size:24px; font-weight:800; margin-top:6px;">Delivered Successfully! 🎉</div>
+          <p style="margin:8px 0 0; color:#374151;">Order <strong>#${shortId}</strong></p>
+          <p style="margin:6px 0 0; color:#374151;">Your bouquet has been delivered. We hope you love it!</p>
+        </div>
+        <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
+          <div style="font-size:14px; font-weight:800;">💐 Enjoy Your Flowers!</div>
+          <p style="margin:6px 0 0; color:#374151;">We hope your flowers bring joy and beauty to your space.</p>
+          <p style="margin:10px 0 0; color:#374151;"><strong>Care Tips:</strong></p>
+          <ul style="margin:6px 0 0 20px; color:#374151;">
+            <li>Change water every 2-3 days</li>
+            <li>Trim stems at an angle</li>
+            <li>Keep away from direct sunlight</li>
+            <li>Remove wilted flowers promptly</li>
+          </ul>
+          <p style="margin:10px 0 0; color:#6b7280; font-size:13px;">Thank you for choosing Arics! We'd love to hear your feedback.</p>
+        </div>
+      `,
+      includeQr: false
+    },
+    cancelled: {
+      title: 'Order Cancelled',
+      subject: `Order Cancelled (#${shortId})`,
+      content: `
+        <div style="padding:16px; border:1px solid rgba(236,72,153,0.2); border-radius:14px; background:linear-gradient(135deg,#fff1f2,#fdf2f8,#f5f3ff)">
+          <div style="font-size:12px; letter-spacing:0.25em; text-transform:uppercase; color:#be185d; font-weight:700;">Arics</div>
+          <div style="font-size:24px; font-weight:800; margin-top:6px;">Order Cancelled</div>
+          <p style="margin:8px 0 0; color:#374151;">Order <strong>#${shortId}</strong></p>
+          <p style="margin:6px 0 0; color:#374151;">Your order has been cancelled.</p>
+        </div>
+        <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
+          <div style="font-size:14px; font-weight:800;">What Happened?</div>
+          <p style="margin:6px 0 0; color:#374151;">This order has been cancelled as requested.</p>
+          <p style="margin:6px 0 0; color:#374151;">If you have any questions or if this was unexpected, please reply to this email or contact our support team.</p>
+          <p style="margin:10px 0 0; color:#374151;"><strong>Order Total:</strong> ₹${total}</p>
+          <p style="margin:6px 0 0; color:#6b7280; font-size:13px;">If payment was made, it will be refunded within 5-7 business days.</p>
+        </div>
+      `,
+      includeQr: false
+    }
+  }
+
+  const template = emailTemplates[status] || {
+    title: 'Order Update',
+    subject: `Order Update (#${shortId})`,
+    content: `
+      <div style="padding:16px; border:1px solid rgba(236,72,153,0.2); border-radius:14px; background:linear-gradient(135deg,#fff1f2,#fdf2f8,#f5f3ff)">
+        <div style="font-size:12px; letter-spacing:0.25em; text-transform:uppercase; color:#be185d; font-weight:700;">Arics</div>
+        <div style="font-size:24px; font-weight:800; margin-top:6px;">Order Update</div>
+        <p style="margin:8px 0 0; color:#374151;">Order <strong>#${shortId}</strong></p>
+        <p style="margin:6px 0 0; color:#374151;">Your order status has been updated to: <strong>${status}</strong></p>
+      </div>
+    `,
+    includeQr: false
+  }
+
+  const html = `
+  <div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; line-height: 1.5; color: #111827; max-width:640px; margin:0 auto; padding:18px;">
+    ${template.content}
+  </div>`
+
+  const attachments = []
+  if (template.includeQr) {
+    const qr = await getQrFromAssets()
+    attachments.push({ filename: `arics-qr-${shortId}.png`, content: qr, cid: 'paymentqr', contentType: 'image/png' })
+  }
+
+  await sendMail({ from, to, subject: `Arics • ${template.subject}`, html, attachments })
 }

@@ -496,49 +496,198 @@ const OrdersAdmin = () => {
   )
 }
 function buildEmailHtml(order) {
+  // Build QR URL - use actual qr.png path from server
   const qrUrl = import.meta.env.VITE_QR_IMAGE_URL || 'https://via.placeholder.com/240x240?text=Scan+to+Pay'
   const name = order.customer?.name || 'Customer'
   const id = String(order._id || '').slice(-6).toUpperCase()
-  const lines = []
+  const total = Number(order.pricing?.total || 0).toFixed(2)
+  const status = order.status || 'pending'
+  
+  // Fix delivery estimate - convert object to string
+  let delivery = 'To be confirmed'
+  if (order.deliveryEstimate) {
+    if (typeof order.deliveryEstimate === 'string') {
+      delivery = order.deliveryEstimate
+    } else if (order.deliveryEstimate.startDate && order.deliveryEstimate.endDate) {
+      delivery = `${order.deliveryEstimate.startDate} - ${order.deliveryEstimate.endDate}`
+    } else if (order.deliveryEstimate.startDate) {
+      delivery = order.deliveryEstimate.startDate
+    }
+  }
+  
+  const address = order.customer?.address || 'Your address'
+  
+  // Build order details section (common for some templates)
+  const orderDetailsLines = []
+  
   // Flowers
   if (Array.isArray(order.selection?.flowers) && order.selection.flowers.length) {
-    lines.push('<h4 style="margin:12px 0 4px">Flowers</h4>')
-    lines.push('<ul style="margin:0;padding-left:16px">')
+    orderDetailsLines.push('<h4 style="margin:12px 0 4px">Flowers</h4>')
+    orderDetailsLines.push('<ul style="margin:0;padding-left:16px">')
     for (const f of order.selection.flowers) {
-      lines.push(`<li>${f.name} × ${f.stems}</li>`)
+      orderDetailsLines.push(`<li>${f.name} × ${f.stems}</li>`)
     }
-    lines.push('</ul>')
+    orderDetailsLines.push('</ul>')
   }
+  
   // Customizations
   if (Array.isArray(order.selection?.customizations) && order.selection.customizations.length) {
-    lines.push('<h4 style="margin:12px 0 4px">Customizations</h4>')
-    lines.push('<ul style="margin:0;padding-left:16px">')
+    orderDetailsLines.push('<h4 style="margin:12px 0 4px">Customizations</h4>')
+    orderDetailsLines.push('<ul style="margin:0;padding-left:16px">')
     for (const c of order.selection.customizations) {
       const qty = c.quantity ? ` × ${c.quantity}` : ''
-      lines.push(`<li>${c.category}: ${c.option}${qty}</li>`)
+      orderDetailsLines.push(`<li>${c.category}: ${c.option}${qty}</li>`)
     }
-    lines.push('</ul>')
+    orderDetailsLines.push('</ul>')
   }
+  
   // Generic items (for cart-based orders)
   if (Array.isArray(order.selection?.items) && order.selection.items.length) {
-    lines.push('<h4 style="margin:12px 0 4px">Items</h4>')
-    lines.push('<ul style="margin:0;padding-left:16px">')
+    orderDetailsLines.push('<h4 style="margin:12px 0 4px">Items</h4>')
+    orderDetailsLines.push('<ul style="margin:0;padding-left:16px">')
     for (const it of order.selection.items) {
-      lines.push(`<li>${it.name} × ${it.quantity}</li>`)
+      orderDetailsLines.push(`<li>${it.name} × ${it.quantity}</li>`)
     }
-    lines.push('</ul>')
+    orderDetailsLines.push('</ul>')
   }
-  const total = Number(order.pricing?.total || 0).toFixed(2)
-  return `
-  <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#3f1d38">
-    <p>Hi ${name},</p>
-    <p>Your order <strong>#${id}</strong> has been <strong>confirmed</strong>. Below are the details:</p>
-    ${lines.join('')}
-    <p style="margin-top:12px">Total: <strong>₹${total}</strong></p>
-    <p>Please complete the payment by scanning the QR code below:</p>
-    <p><img src="${qrUrl}" alt="Payment QR" width="240" height="240" style="border:1px solid #f5c2d1; border-radius:8px"/></p>
-    <p>Thank you for choosing Arics 🌸</p>
-  </div>`
+  
+  const orderDetails = orderDetailsLines.join('')
+  
+  // Status-specific email templates matching backend
+  const emailTemplates = {
+    pending: `
+      <div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; line-height: 1.5; color: #111827; max-width:640px; margin:0 auto; padding:18px;">
+        <div style="padding:16px; border:1px solid rgba(236,72,153,0.2); border-radius:14px; background:linear-gradient(135deg,#fff1f2,#fdf2f8,#f5f3ff)">
+          <div style="font-size:12px; letter-spacing:0.25em; text-transform:uppercase; color:#be185d; font-weight:700;">Arics</div>
+          <div style="font-size:24px; font-weight:800; margin-top:6px;">Order Received! 🌸</div>
+          <p style="margin:8px 0 0; color:#374151;">Order <strong>#${id}</strong></p>
+          <p style="margin:6px 0 0; color:#374151;">Thank you for choosing Arics! We've received your order and will review it shortly.</p>
+        </div>
+        <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
+          <div style="font-size:14px; font-weight:800;">Order Summary</div>
+          ${orderDetails}
+          <p style="margin:6px 0 0; color:#374151;"><strong>Total:</strong> ₹${total}</p>
+          <p style="margin:6px 0 0; color:#374151;"><strong>Status:</strong> Pending Review</p>
+          <p style="margin:10px 0 0; color:#6b7280; font-size:13px;">We'll send you a confirmation email once your order is confirmed.</p>
+        </div>
+      </div>
+    `,
+    
+    confirmed: `
+      <div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; line-height: 1.5; color: #111827; max-width:640px; margin:0 auto; padding:18px;">
+        <div style="padding:16px; border:1px solid rgba(236,72,153,0.2); border-radius:14px; background:linear-gradient(135deg,#fff1f2,#fdf2f8,#f5f3ff)">
+          <div style="font-size:12px; letter-spacing:0.25em; text-transform:uppercase; color:#be185d; font-weight:700;">Arics</div>
+          <div style="font-size:24px; font-weight:800; margin-top:6px;">Order Confirmed! ✨</div>
+          <p style="margin:8px 0 0; color:#374151;">Order <strong>#${id}</strong></p>
+          <p style="margin:6px 0 0; color:#374151;">Your order is confirmed and scheduled for preparation!</p>
+        </div>
+        <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
+          <div style="font-size:14px; font-weight:800;">Order Details</div>
+          ${orderDetails}
+          <p style="margin:6px 0 0; color:#374151;"><strong>Total:</strong> ₹${total}</p>
+          <p style="margin:6px 0 0; color:#374151;"><strong>Delivery:</strong> ${delivery}</p>
+        </div>
+        <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
+          <div style="font-size:14px; font-weight:800;">💳 Payment Required</div>
+          <p style="margin:6px 0 0; color:#374151;">Please scan the QR code below to complete your payment.</p>
+          <div style="margin-top:10px; text-align:center;"><img src="${qrUrl}" width="220" height="220" alt="Payment QR" style="border-radius:12px; border:1px solid rgba(236,72,153,0.18)"/></div>
+        </div>
+      </div>
+    `,
+    
+    payment_received: `
+      <div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; line-height: 1.5; color: #111827; max-width:640px; margin:0 auto; padding:18px;">
+        <div style="padding:16px; border:1px solid rgba(236,72,153,0.2); border-radius:14px; background:linear-gradient(135deg,#fff1f2,#fdf2f8,#f5f3ff)">
+          <div style="font-size:12px; letter-spacing:0.25em; text-transform:uppercase; color:#be185d; font-weight:700;">Arics</div>
+          <div style="font-size:24px; font-weight:800; margin-top:6px;">Payment Received! 💝</div>
+          <p style="margin:8px 0 0; color:#374151;">Order <strong>#${id}</strong></p>
+          <p style="margin:6px 0 0; color:#374151;">We've received your payment of <strong>₹${total}</strong>. Thank you!</p>
+        </div>
+        <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
+          <div style="font-size:14px; font-weight:800;">What's Next?</div>
+          <p style="margin:6px 0 0; color:#374151;">Our expert florists will now begin preparing your beautiful bouquet with the utmost care.</p>
+          <p style="margin:6px 0 0; color:#374151;">Expected delivery: <strong>${delivery}</strong></p>
+        </div>
+      </div>
+    `,
+    
+    preparing: `
+      <div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; line-height: 1.5; color: #111827; max-width:640px; margin:0 auto; padding:18px;">
+        <div style="padding:16px; border:1px solid rgba(236,72,153,0.2); border-radius:14px; background:linear-gradient(135deg,#fff1f2,#fdf2f8,#f5f3ff)">
+          <div style="font-size:12px; letter-spacing:0.25em; text-transform:uppercase; color:#be185d; font-weight:700;">Arics</div>
+          <div style="font-size:24px; font-weight:800; margin-top:6px;">Crafting Your Bouquet 🌹</div>
+          <p style="margin:8px 0 0; color:#374151;">Order <strong>#${id}</strong></p>
+          <p style="margin:6px 0 0; color:#374151;">Our talented florists are carefully arranging your flowers!</p>
+        </div>
+        <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
+          <div style="font-size:14px; font-weight:800;">🎨 In Progress</div>
+          <p style="margin:6px 0 0; color:#374151;">Each stem is being selected and arranged with love and expertise.</p>
+          <p style="margin:6px 0 0; color:#374151;">Your bouquet will be ready for delivery soon!</p>
+        </div>
+      </div>
+    `,
+    
+    out_for_delivery: `
+      <div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; line-height: 1.5; color: #111827; max-width:640px; margin:0 auto; padding:18px;">
+        <div style="padding:16px; border:1px solid rgba(236,72,153,0.2); border-radius:14px; background:linear-gradient(135deg,#fff1f2,#fdf2f8,#f5f3ff)">
+          <div style="font-size:12px; letter-spacing:0.25em; text-transform:uppercase; color:#be185d; font-weight:700;">Arics</div>
+          <div style="font-size:24px; font-weight:800; margin-top:6px;">Out for Delivery! 🚚</div>
+          <p style="margin:8px 0 0; color:#374151;">Order <strong>#${id}</strong></p>
+          <p style="margin:6px 0 0; color:#374151;">Your beautiful bouquet is on its way to you!</p>
+        </div>
+        <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
+          <div style="font-size:14px; font-weight:800;">📦 Delivery in Progress</div>
+          <p style="margin:6px 0 0; color:#374151;">Your flowers are being carefully transported to ensure they arrive fresh and beautiful.</p>
+          <p style="margin:6px 0 0; color:#374151;"><strong>Delivery to:</strong> ${name}</p>
+          <p style="margin:6px 0 0; color:#374151;"><strong>Address:</strong> ${address}</p>
+        </div>
+      </div>
+    `,
+    
+    delivered: `
+      <div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; line-height: 1.5; color: #111827; max-width:640px; margin:0 auto; padding:18px;">
+        <div style="padding:16px; border:1px solid rgba(236,72,153,0.2); border-radius:14px; background:linear-gradient(135deg,#fff1f2,#fdf2f8,#f5f3ff)">
+          <div style="font-size:12px; letter-spacing:0.25em; text-transform:uppercase; color:#be185d; font-weight:700;">Arics</div>
+          <div style="font-size:24px; font-weight:800; margin-top:6px;">Delivered Successfully! 🎉</div>
+          <p style="margin:8px 0 0; color:#374151;">Order <strong>#${id}</strong></p>
+          <p style="margin:6px 0 0; color:#374151;">Your bouquet has been delivered. We hope you love it!</p>
+        </div>
+        <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
+          <div style="font-size:14px; font-weight:800;">💐 Enjoy Your Flowers!</div>
+          <p style="margin:6px 0 0; color:#374151;">We hope your flowers bring joy and beauty to your space.</p>
+          <p style="margin:10px 0 0; color:#374151;"><strong>Care Tips:</strong></p>
+          <ul style="margin:6px 0 0 20px; color:#374151;">
+            <li>Change water every 2-3 days</li>
+            <li>Trim stems at an angle</li>
+            <li>Keep away from direct sunlight</li>
+            <li>Remove wilted flowers promptly</li>
+          </ul>
+          <p style="margin:10px 0 0; color:#6b7280; font-size:13px;">Thank you for choosing Arics! We'd love to hear your feedback.</p>
+        </div>
+      </div>
+    `,
+    
+    cancelled: `
+      <div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; line-height: 1.5; color: #111827; max-width:640px; margin:0 auto; padding:18px;">
+        <div style="padding:16px; border:1px solid rgba(236,72,153,0.2); border-radius:14px; background:linear-gradient(135deg,#fff1f2,#fdf2f8,#f5f3ff)">
+          <div style="font-size:12px; letter-spacing:0.25em; text-transform:uppercase; color:#be185d; font-weight:700;">Arics</div>
+          <div style="font-size:24px; font-weight:800; margin-top:6px;">Order Cancelled</div>
+          <p style="margin:8px 0 0; color:#374151;">Order <strong>#${id}</strong></p>
+          <p style="margin:6px 0 0; color:#374151;">Your order has been cancelled.</p>
+        </div>
+        <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
+          <div style="font-size:14px; font-weight:800;">What Happened?</div>
+          <p style="margin:6px 0 0; color:#374151;">This order has been cancelled as requested.</p>
+          <p style="margin:6px 0 0; color:#374151;">If you have any questions or if this was unexpected, please reply to this email or contact our support team.</p>
+          <p style="margin:10px 0 0; color:#374151;"><strong>Order Total:</strong> ₹${total}</p>
+          <p style="margin:6px 0 0; color:#6b7280; font-size:13px;">If payment was made, it will be refunded within 5-7 business days.</p>
+        </div>
+      </div>
+    `
+  }
+  
+  // Return the appropriate template based on status, fallback to confirmed
+  return emailTemplates[status] || emailTemplates.confirmed
 }
 
 function getErrorMessage(err) {

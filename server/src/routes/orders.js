@@ -4,8 +4,9 @@ import Flower from '../models/Flower.js'
 import AdminSettings from '../models/AdminSettings.js'
 import { estimateDelivery } from '../utils/delivery.js'
 import { protect, requireRole } from '../middleware/auth.js'
-import { sendOrderConfirmedEmail } from '../utils/orderEmail.js'
+import { sendOrderConfirmedEmail, sendStatusEmail } from '../utils/orderEmail.js'
 import { sendMail } from '../lib/mailer.js'
+import Product from '../models/Product.js'
 
 const router = express.Router()
 
@@ -49,10 +50,16 @@ router.patch('/:id', protect, requireRole('admin'), async (req, res, next) => {
       return next(new Error('Invalid status'))
     }
 
+    const prev = await Order.findById(req.params.id)
     const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true })
     if (!order) {
       res.status(404)
       return next(new Error('Order not found'))
+    }
+
+    // Fire-and-forget status email when status actually changes
+    if (prev?.status !== order.status) {
+      sendStatusEmail(order, order.status).catch(() => {})
     }
 
     res.json(order)
@@ -122,30 +129,46 @@ router.post('/', async (req, res, next) => {
     const settings = await AdminSettings.findOne()
     const quantity = Number(selection.quantity || 0)
 
-    const flowerIds = (selection.flowers || []).map((f) => f.flowerId)
-    const flowers = await Flower.find({ _id: { $in: flowerIds } })
-    const byId = new Map(flowers.map((f) => [String(f._id), f]))
+    const hasItems = Array.isArray(selection.items) && selection.items.length > 0
 
-    for (const item of selection.flowers || []) {
-      const dbFlower = byId.get(String(item.flowerId))
-      if (!dbFlower || !dbFlower.enabled) {
-        res.status(400)
-        return next(new Error(`Flower unavailable: ${item.name || item.flowerId}`))
+    let base = 0
+    let addOns = 0
+
+    if (hasItems) {
+      // Cart-based checkout: compute from items
+      base = selection.items.reduce(
+        (sum, it) => sum + Number(it.unitPrice || 0) * Number(it.quantity || 0),
+        0,
+      )
+      addOns = 0
+    } else {
+      // Custom bouquet checkout: compute from flowers + customizations
+      const flowerIds = (selection.flowers || []).map((f) => f.flowerId)
+      const flowers = await Flower.find({ _id: { $in: flowerIds } })
+      const byId = new Map(flowers.map((f) => [String(f._id), f]))
+
+      for (const item of selection.flowers || []) {
+        const dbFlower = byId.get(String(item.flowerId))
+        if (!dbFlower || !dbFlower.enabled) {
+          res.status(400)
+          return next(new Error(`Flower unavailable: ${item.name || item.flowerId}`))
+        }
+        if (item.stems > dbFlower.stock) {
+          res.status(400)
+          return next(new Error(`Insufficient stock for ${dbFlower.name}`))
+        }
       }
-      if (item.stems > dbFlower.stock) {
-        res.status(400)
-        return next(new Error(`Insufficient stock for ${dbFlower.name}`))
-      }
+
+      base = (selection.flowers || []).reduce(
+        (sum, f) => sum + Number(f.stems || 0) * Number(f.pricePerStem || 0),
+        0,
+      )
+      addOns = (selection.customizations || []).reduce(
+        (sum, c) => sum + Number(c.price || 0) * (c.quantity || 1),
+        0,
+      )
     }
 
-    const base = (selection.flowers || []).reduce(
-      (sum, f) => sum + Number(f.stems || 0) * Number(f.pricePerStem || 0),
-      0,
-    )
-    const addOns = (selection.customizations || []).reduce(
-      (sum, c) => sum + Number(c.price || 0) * (c.quantity || 1),
-      0,
-    )
     const taxRate = settings?.taxRate ?? 0.05
     const tax = (base + addOns) * taxRate
     const delivery = settings?.deliveryFee ?? 4.99
@@ -164,8 +187,17 @@ router.post('/', async (req, res, next) => {
       deliveryEstimate: estimate,
     })
 
-    for (const item of selection.flowers || []) {
-      await Flower.findByIdAndUpdate(item.flowerId, { $inc: { stock: -item.stems } })
+    // decrement stock: products for cart, flowers for custom bouquet
+    if (hasItems) {
+      for (const it of selection.items || []) {
+        if (it.refId) {
+          await Product.findByIdAndUpdate(it.refId, { $inc: { stock: -Number(it.quantity || 0) } })
+        }
+      }
+    } else {
+      for (const item of selection.flowers || []) {
+        await Flower.findByIdAndUpdate(item.flowerId, { $inc: { stock: -item.stems } })
+      }
     }
 
     res.status(201).json(order)

@@ -1,5 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import bhagyashreeImg from "../assets/bhagyashree.jpeg";
+import ayushImg from "../assets/ayush.jpeg";
+import manthanImg from "../assets/manthan.jpeg";
 
 const AboutUs = () => {
   const observerRef = useRef(null);
@@ -34,21 +37,21 @@ const AboutUs = () => {
       role: "FOUNDER",
       description:
         "Visionary behind Arics, blending creativity with emotional storytelling through flowers.",
-      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop",
+      image: bhagyashreeImg,
     },
     {
       name: "Ayush Mhatre",
       role: "CO-FOUNDER",
       description:
         "Oversees operations and floral design execution, ensuring quality and consistency.",
-      image: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=400&h=400&fit=crop",
+      image: ayushImg,
     },
     {
       name: "Manthan Railkar",
       role: "TECH HEAD",
       description:
         "Leads digital presence and technical innovation behind the Arics experience.",
-      image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop",
+      image: manthanImg,
     },
   ];
 

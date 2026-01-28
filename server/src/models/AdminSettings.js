@@ -12,6 +12,11 @@ const adminSettingsSchema = new mongoose.Schema(
         days: Number,
       },
     ],
+    paymentQrImage: {
+      data: Buffer,
+      contentType: String,
+      uploadedAt: Date,
+    },
   },
   { timestamps: true },
 )
