@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-const Navbar = ({ currentPage, setCurrentPage }) => {
+const Navbar = ({ currentPage, setCurrentPage, showAdmin = false }) => {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -144,22 +144,24 @@ const Navbar = ({ currentPage, setCurrentPage }) => {
               ></span>
             </motion.button>
 
-            <motion.button
-              onClick={() => handleNavigation("admin")}
-              className={`font-['Cinzel'] text-sm tracking-widest transition-colors relative group ${
-                currentPage === "admin"
-                  ? "text-pink-600"
-                  : "text-pink-800 hover:text-pink-600"
-              }`}
-              whileHover={{ y: -2 }}
-            >
-              ADMIN
-              <span
-                className={`absolute -bottom-1 left-0 h-0.5 bg-pink-600 transition-all duration-300 ${
-                  currentPage === "admin" ? "w-full" : "w-0 group-hover:w-full"
+            {showAdmin && (
+              <motion.button
+                onClick={() => handleNavigation("admin")}
+                className={`font-['Cinzel'] text-sm tracking-widest transition-colors relative group ${
+                  currentPage === "admin"
+                    ? "text-pink-600"
+                    : "text-pink-800 hover:text-pink-600"
                 }`}
-              ></span>
-            </motion.button>
+                whileHover={{ y: -2 }}
+              >
+                ADMIN
+                <span
+                  className={`absolute -bottom-1 left-0 h-0.5 bg-pink-600 transition-all duration-300 ${
+                    currentPage === "admin" ? "w-full" : "w-0 group-hover:w-full"
+                  }`}
+                ></span>
+              </motion.button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}

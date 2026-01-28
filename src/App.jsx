@@ -1,30 +1,74 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
 import AboutUs from "./pages/AboutUs";
 import { CustomisationApp } from "./customisation";
 import ProductsPage from "./pages/ProductsPage";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminPortal from "./pages/AdminPortal";
 import "./App.css";
+
+const ADMIN_UNLOCK_STORAGE_KEY = "arics_admin_unlocked";
 
 const App = () => {
   const [currentPage, setCurrentPage] = useState("home");
+  const [adminUnlocked, setAdminUnlocked] = useState(
+    () => sessionStorage.getItem(ADMIN_UNLOCK_STORAGE_KEY) === "1"
+  );
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      // Hidden key combo: Ctrl + Shift + A
+      if (e.ctrlKey && e.shiftKey && e.key && e.key.toLowerCase() === "a") {
+        e.preventDefault();
+        setAdminUnlocked((prev) => {
+          const next = !prev;
+          if (next) {
+            sessionStorage.setItem(ADMIN_UNLOCK_STORAGE_KEY, "1");
+            toast.success("Admin unlocked");
+            setCurrentPage("admin");
+          } else {
+            sessionStorage.removeItem(ADMIN_UNLOCK_STORAGE_KEY);
+            toast("Admin hidden", { icon: "🌸" });
+            setCurrentPage("home");
+          }
+          return next;
+        });
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   const renderPage = () => {
     switch (currentPage) {
       case "customize":
-        return <CustomisationApp />;
+        return (
+          <CustomisationApp
+            onOpenAdmin={adminUnlocked ? () => setCurrentPage("admin") : undefined}
+          />
+        );
       case "products":
         return <ProductsPage />;
       case "admin":
-        return <AdminDashboard />;
+        if (!adminUnlocked) {
+          // Admin route is hidden unless unlocked via the secret key combo.
+          return <HeroSection />;
+        }
+        return <AdminPortal onExit={() => setCurrentPage("home")} />;
       case "about":
         return <AboutUs />;
       case "home":
       default:
         return (
           <>
-            <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+            <Navbar
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              showAdmin={adminUnlocked}
+            />
             <HeroSection />
           </>
         );
@@ -33,11 +77,16 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
+      <Toaster position="top-right" />
       {currentPage === "home" ? (
         renderPage()
       ) : (
         <>
-          <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+          <Navbar
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            showAdmin={adminUnlocked}
+          />
           {renderPage()}
         </>
       )}

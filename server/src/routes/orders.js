@@ -16,6 +16,48 @@ router.get('/', protect, requireRole('admin'), async (req, res, next) => {
   }
 })
 
+router.get('/:id', protect, requireRole('admin'), async (req, res, next) => {
+  try {
+    const order = await Order.findById(req.params.id)
+    if (!order) {
+      res.status(404)
+      return next(new Error('Order not found'))
+    }
+    res.json(order)
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.patch('/:id', protect, requireRole('admin'), async (req, res, next) => {
+  try {
+    const allowedStatuses = [
+      'pending',
+      'confirmed',
+      'preparing',
+      'out_for_delivery',
+      'delivered',
+      'cancelled',
+    ]
+
+    const { status } = req.body
+    if (!allowedStatuses.includes(status)) {
+      res.status(400)
+      return next(new Error('Invalid status'))
+    }
+
+    const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true })
+    if (!order) {
+      res.status(404)
+      return next(new Error('Order not found'))
+    }
+
+    res.json(order)
+  } catch (err) {
+    next(err)
+  }
+})
+
 router.post('/', async (req, res, next) => {
   try {
     const { customer, selection } = req.body

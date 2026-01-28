@@ -4,7 +4,7 @@ import ProductForm from "../components/ProductForm";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-const AdminDashboard = () => {
+const AdminDashboard = ({ embedded = false }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -13,9 +13,9 @@ const AdminDashboard = () => {
   const [filterCategory, setFilterCategory] = useState("all");
   const [sortBy, setSortBy] = useState("createdAt");
 
-  // Get auth token (you'll need to implement your auth logic)
+  // Get auth token (set by AdminPortal login)
   const getAuthToken = () => {
-    return localStorage.getItem("authToken");
+    return localStorage.getItem("arics_admin_token");
   };
 
   // Fetch all products (including inactive)
@@ -173,20 +173,30 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 py-20 px-6 lg:px-12">
+    <div
+      className={
+        embedded
+          ? ""
+          : "min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 py-20 px-6 lg:px-12"
+      }
+    >
       {/* Header */}
       <motion.div
-        className="max-w-7xl mx-auto mb-12"
+        className={`max-w-7xl mx-auto ${embedded ? "mb-6" : "mb-12"}`}
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <h1 className="text-5xl md:text-6xl font-['Playfair_Display'] font-bold text-gray-900 mb-2">
-              Products Admin
+            <h1
+              className={`font-['Playfair_Display'] font-bold text-gray-900 mb-2 ${
+                embedded ? "text-3xl md:text-4xl" : "text-5xl md:text-6xl"
+              }`}
+            >
+              Products
             </h1>
-            <p className="text-xl font-['Cormorant_Garamond'] text-gray-600 italic">
+            <p className={`font-['Cormorant_Garamond'] text-gray-600 italic ${embedded ? "text-lg" : "text-xl"}`}>
               Manage your product catalog
             </p>
           </div>
