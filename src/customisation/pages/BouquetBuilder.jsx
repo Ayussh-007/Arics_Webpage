@@ -12,6 +12,93 @@ import { useBouquetStore } from '../store/useBouquetStore'
 import { computePricing, estimateDelivery } from '../utils/pricing'
 import { fetchCustomizations, fetchFlowers, fetchSettings } from '../api/services'
 
+// Default fallback data
+const DEFAULT_FLOWERS = [
+  {
+    _id: 'default-rose',
+    name: 'Rose',
+    pricePerStem: 50,
+    image: 'https://images.unsplash.com/photo-1518709594023-6eab9bab7b23?w=400',
+    color: '#dc2626',
+    enabled: true
+  },
+  {
+    _id: 'default-lily',
+    name: 'Lily',
+    pricePerStem: 80,
+    image: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400',
+    color: '#f97316',
+    enabled: true
+  },
+  {
+    _id: 'default-tulip',
+    name: 'Tulip',
+    pricePerStem: 60,
+    image: 'https://images.unsplash.com/photo-1520763185298-1b434c919102?w=400',
+    color: '#eab308',
+    enabled: true
+  },
+  {
+    _id: 'default-orchid',
+    name: 'Orchid',
+    pricePerStem: 100,
+    image: 'https://images.unsplash.com/photo-1583623025817-d180a2221d0a?w=400',
+    color: '#a855f7',
+    enabled: true
+  }
+]
+
+const DEFAULT_CUSTOMIZATIONS = [
+  {
+    _id: 'default-paper',
+    category: 'paper',
+    label: 'Wrapping Paper',
+    inputType: 'radio',
+    options: [
+      { name: 'Classic White', price: 50, enabled: true },
+      { name: 'Kraft Brown', price: 40, enabled: true },
+      { name: 'Blush Pink', price: 60, enabled: true },
+      { name: 'Luxury Black', price: 80, enabled: true }
+    ]
+  },
+  {
+    _id: 'default-ribbon',
+    category: 'ribbon',
+    label: 'Ribbon',
+    inputType: 'radio',
+    options: [
+      { name: 'Satin White', price: 30, enabled: true },
+      { name: 'Silk Pink', price: 40, enabled: true },
+      { name: 'Velvet Red', price: 50, enabled: true },
+      { name: 'Gold Metallic', price: 60, enabled: true }
+    ]
+  },
+  {
+    _id: 'default-addons',
+    category: 'addons',
+    label: 'Add-ons',
+    inputType: 'checkbox',
+    options: [
+      { name: 'Greeting Card', price: 50, enabled: true },
+      { name: 'Chocolates', price: 150, enabled: true },
+      { name: 'Teddy Bear', price: 200, enabled: true },
+      { name: 'Vase', price: 300, enabled: true }
+    ]
+  }
+]
+
+const DEFAULT_SETTINGS = {
+  basePricing: {
+    basePrice: 200,
+    perStemCharge: 30
+  },
+  delivery: {
+    baseDays: 2,
+    largeOrderThreshold: 15,
+    largeOrderExtraDays: 1
+  }
+}
+
 const BouquetBuilder = ({ onCheckout }) => {
   const { step, setStep, selection, setQuantity, setFlowerStem, toggleCustomization } =
     useBouquetStore()
@@ -21,6 +108,7 @@ const BouquetBuilder = ({ onCheckout }) => {
   const [loading, setLoading] = useState(true)
   const [customQuantity, setCustomQuantity] = useState(8)
   const [showSlider, setShowSlider] = useState(false)
+  const [usingDefaults, setUsingDefaults] = useState(false)
 
   useEffect(() => {
     const load = async () => {
@@ -30,11 +118,29 @@ const BouquetBuilder = ({ onCheckout }) => {
           fetchCustomizations(),
           fetchSettings(),
         ])
-        setFlowers(f)
-        setCustomizations(c)
-        setSettings(s)
+        
+        // Use fetched data if available, otherwise use defaults
+        setFlowers(f && f.length > 0 ? f : DEFAULT_FLOWERS)
+        setCustomizations(c && c.length > 0 ? c : DEFAULT_CUSTOMIZATIONS)
+        setSettings(s || DEFAULT_SETTINGS)
+        
+        if (!f || f.length === 0 || !c || c.length === 0 || !s) {
+          setUsingDefaults(true)
+          toast.success('Using demo data. Connect to backend for full features.', {
+            duration: 4000,
+            icon: '💐'
+          })
+        }
       } catch (err) {
-        toast.error('Unable to load bouquet data. Using defaults.')
+        console.error('Error loading bouquet data:', err)
+        // Use default data on error
+        setFlowers(DEFAULT_FLOWERS)
+        setCustomizations(DEFAULT_CUSTOMIZATIONS)
+        setSettings(DEFAULT_SETTINGS)
+        setUsingDefaults(true)
+        toast.error('Unable to connect to server. Using demo data.', {
+          duration: 4000
+        })
       } finally {
         setLoading(false)
       }
@@ -61,8 +167,11 @@ const BouquetBuilder = ({ onCheckout }) => {
 
   if (loading) {
     return (
-      <div className="p-10">
-        <div className="animate-pulse text-pink-600">Loading bouquet builder...</div>
+      <div className="p-10 flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-pink-600 mx-auto mb-4"></div>
+          <div className="text-pink-600 font-['Cinzel']">Loading bouquet builder...</div>
+        </div>
       </div>
     )
   }
@@ -74,6 +183,13 @@ const BouquetBuilder = ({ onCheckout }) => {
           title="Design Your Custom Bouquet"
           subtitle="Select stems, wrapping, and add-ons. Each choice updates your price and delivery."
         />
+        {usingDefaults && (
+          <div className="bg-pink-50 border border-pink-200 rounded-lg p-4 text-center">
+            <p className="text-pink-700 font-['Lato'] text-sm">
+              🌸 Demo Mode: Using sample data. Start the backend server to access full features.
+            </p>
+          </div>
+        )}
         <Stepper step={step} />
       </div>
 
