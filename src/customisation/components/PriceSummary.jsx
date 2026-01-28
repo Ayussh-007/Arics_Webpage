@@ -3,9 +3,9 @@ import GlassCard from './GlassCard'
 
 const PriceSummary = ({ pricing, deliveryDays }) => {
   return (
-    <GlassCard className="p-6 space-y-4">
-      <h3 className="text-xl font-['Italiana'] text-pink-700">Price Summary</h3>
-      <div className="space-y-2 text-sm text-pink-800">
+    <GlassCard className="p-4 sm:p-6 space-y-3 sm:space-y-4">
+      <h3 className="text-lg sm:text-xl font-['Italiana'] text-pink-700">Price Summary</h3>
+      <div className="space-y-2 text-xs sm:text-sm text-pink-800">
         <div className="flex justify-between">
           <span>Base</span>
           <span>₹{pricing.base.toFixed(2)}</span>
@@ -22,7 +22,7 @@ const PriceSummary = ({ pricing, deliveryDays }) => {
           <span>Delivery</span>
           <span>₹{pricing.delivery.toFixed(2)}</span>
         </div>
-        <div className="flex justify-between font-semibold text-pink-900 pt-2 border-t border-pink-300">
+        <div className="flex justify-between font-semibold text-pink-900 pt-2 border-t border-pink-300 text-sm sm:text-base">
           <span>Total</span>
           <span>₹{pricing.total.toFixed(2)}</span>
         </div>
