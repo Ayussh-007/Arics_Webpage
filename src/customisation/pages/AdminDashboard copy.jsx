@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductForm from "../components/ProductForm";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 const AdminDashboard = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +28,7 @@ const AdminDashboard = () => {
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `http://localhost:5000/api/products/admin/all?sortBy=${sortBy}`,
+        `${API_BASE_URL}/products/admin/all?sortBy=${sortBy}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -56,7 +58,7 @@ const AdminDashboard = () => {
   const handleCreateProduct = async (productData) => {
     try {
       const token = getAuthToken();
-      const response = await fetch("http://localhost:5000/api/products", {
+      const response = await fetch(`${API_BASE_URL}/products`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -84,7 +86,7 @@ const AdminDashboard = () => {
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `http://localhost:5000/api/products/${editingProduct._id}`,
+        `${API_BASE_URL}/products/${editingProduct._id}`,
         {
           method: "PUT",
           headers: {
@@ -115,7 +117,7 @@ const AdminDashboard = () => {
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `http://localhost:5000/api/products/${productId}/toggle`,
+        `${API_BASE_URL}/products/${productId}/toggle`,
         {
           method: "PATCH",
           headers: {
@@ -141,7 +143,7 @@ const AdminDashboard = () => {
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `http://localhost:5000/api/products/${productId}`,
+        `${API_BASE_URL}/products/${productId}`,
         {
           method: "DELETE",
           headers: {

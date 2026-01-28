@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "../components/ProductCard";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -32,9 +34,7 @@ const ProductsPage = () => {
         params.append("hasOffer", "true");
       }
 
-      const response = await fetch(
-        `http://localhost:5000/api/products?${params}`
-      );
+      const response = await fetch(`${API_BASE_URL}/products?${params}`);
       const data = await response.json();
       setProducts(data.products || []);
       setFilteredProducts(data.products || []);
@@ -72,7 +72,7 @@ const ProductsPage = () => {
   const handleAddToCart = async (product) => {
     // Increment popularity
     try {
-      await fetch(`http://localhost:5000/api/products/${product._id}/view`, {
+      await fetch(`${API_BASE_URL}/products/${product._id}/view`, {
         method: "POST",
       });
     } catch (error) {

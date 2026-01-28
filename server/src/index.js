@@ -1,4 +1,4 @@
-import 'dotenv/config'
+import './env.js'
 import express from 'express'
 import cors from 'cors'
 import morgan from 'morgan'
@@ -12,7 +12,7 @@ import adminSettingsRoutes from './routes/adminSettings.js'
 import productRoutes from './routes/products.js'
 
 const app = express()
-const PORT = process.env.PORT || 5001
+const PORT = Number(process.env.PORT) || 5000
 
 app.use(cors())
 app.use(express.json({ limit: '2mb' }))
@@ -34,9 +34,15 @@ app.use(errorHandler)
 
 connectDB()
   .then(() => {
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       // eslint-disable-next-line no-console
       console.log(`API listening on http://localhost:${PORT}`)
+    })
+
+    server.on('error', (err) => {
+      // eslint-disable-next-line no-console
+      console.error('Server failed to start:', err.message)
+      process.exit(1)
     })
   })
   .catch((err) => {
