@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
+import AboutUs from "./pages/AboutUs";
 import { CustomisationApp } from "./customisation";
 import "./App.css";
 
@@ -11,6 +12,8 @@ const App = () => {
     switch (currentPage) {
       case "customize":
         return <CustomisationApp />;
+      case "about":
+        return <AboutUs />;
       case "home":
       default:
         return (

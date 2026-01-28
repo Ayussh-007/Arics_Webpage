@@ -129,14 +129,24 @@ const Navbar = ({ currentPage, setCurrentPage }) => {
               ></span>
             </motion.button>
 
-            <motion.a
-              href="#about"
-              className="text-pink-800 font-['Cinzel'] text-sm tracking-widest hover:text-pink-600 transition-colors relative group"
+            <motion.button
+              onClick={() => handleNavigation("about")}
+              className={`font-['Cinzel'] text-sm tracking-widest transition-colors relative group ${
+                currentPage === "about"
+                  ? "text-pink-600"
+                  : "text-pink-800 hover:text-pink-600"
+              }`}
               whileHover={{ y: -2 }}
             >
               ABOUT US
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-pink-600 transition-all duration-300 group-hover:w-full"></span>
-            </motion.a>
+              <span
+                className={`absolute -bottom-1 left-0 h-0.5 bg-pink-600 transition-all duration-300 ${
+                  currentPage === "about"
+                    ? "w-full"
+                    : "w-0 group-hover:w-full"
+                }`}
+              ></span>
+            </motion.button>
           </div>
 
           {/* Mobile Menu Button */}
