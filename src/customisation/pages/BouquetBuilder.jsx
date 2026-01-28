@@ -68,8 +68,8 @@ const BouquetBuilder = ({ onCheckout }) => {
   }
 
   return (
-    <div className="space-y-10">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+    <div className="space-y-6 sm:space-y-10">
+      <div className="flex flex-col gap-4 sm:gap-6">
         <SectionHeader
           title="Design Your Custom Bouquet"
           subtitle="Select stems, wrapping, and add-ons. Each choice updates your price and delivery."
@@ -77,12 +77,12 @@ const BouquetBuilder = ({ onCheckout }) => {
         <Stepper step={step} />
       </div>
 
-      <div className="grid lg:grid-cols-[2fr_1fr] gap-8">
-        <div className="space-y-8">
+      <div className="grid lg:grid-cols-[2fr_1fr] gap-6 sm:gap-8">
+        <div className="space-y-6 sm:space-y-8 order-2 lg:order-1">
           {step === 1 && (
-            <GlassCard className="p-6 space-y-6">
-              <h3 className="text-xl font-['Italiana'] text-pink-700">1. Choose Quantity</h3>
-              <div className="flex flex-wrap gap-3">
+            <GlassCard className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+              <h3 className="text-lg sm:text-xl font-['Italiana'] text-pink-700">1. Choose Quantity</h3>
+              <div className="flex flex-wrap gap-2 sm:gap-3">
                 {[5, 7, 9].map((qty) => (
                   <OptionPill
                     key={qty}
@@ -130,7 +130,7 @@ const BouquetBuilder = ({ onCheckout }) => {
               
               <div className="flex justify-between">
                 <button
-                  className="px-6 py-3 rounded-full bg-pink-600 text-white font-['Cinzel'] text-sm tracking-wider hover:bg-pink-700 transition-colors shadow-lg"
+                  className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-full bg-pink-600 text-white font-['Cinzel'] tracking-wider hover:bg-pink-700 transition-colors shadow-lg"
                   onClick={() => setStep(2)}
                 >
                   Continue
@@ -140,9 +140,9 @@ const BouquetBuilder = ({ onCheckout }) => {
           )}
 
           {step === 2 && (
-            <GlassCard className="p-6 space-y-6">
-              <h3 className="text-xl font-['Italiana'] text-pink-700">2. Select Flowers</h3>
-              <div className="grid md:grid-cols-2 gap-4">
+            <GlassCard className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+              <h3 className="text-lg sm:text-xl font-['Italiana'] text-pink-700">2. Select Flowers</h3>
+              <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
                 {flowers.map((flower) => (
                   <FlowerCard
                     key={flower._id}
@@ -152,15 +152,15 @@ const BouquetBuilder = ({ onCheckout }) => {
                   />
                 ))}
               </div>
-              <div className="flex justify-between">
+              <div className="flex flex-col sm:flex-row justify-between gap-3">
                 <button
-                  className="px-6 py-3 rounded-full bg-white text-pink-700 border border-pink-300 font-['Cinzel'] text-sm tracking-wider hover:bg-pink-50 transition-colors"
+                  className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-full bg-white text-pink-700 border border-pink-300 font-['Cinzel'] tracking-wider hover:bg-pink-50 transition-colors"
                   onClick={() => setStep(1)}
                 >
                   Back
                 </button>
                 <button
-                  className="px-6 py-3 rounded-full bg-pink-600 text-white font-['Cinzel'] text-sm tracking-wider hover:bg-pink-700 transition-colors shadow-lg"
+                  className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-full bg-pink-600 text-white font-['Cinzel'] tracking-wider hover:bg-pink-700 transition-colors shadow-lg"
                   onClick={() => setStep(3)}
                 >
                   Continue
@@ -170,12 +170,12 @@ const BouquetBuilder = ({ onCheckout }) => {
           )}
 
           {step === 3 && (
-            <GlassCard className="p-6 space-y-6">
-              <h3 className="text-xl font-['Italiana'] text-pink-700">3. Wrap & Add-ons</h3>
-              <div className="space-y-6">
+            <GlassCard className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+              <h3 className="text-lg sm:text-xl font-['Italiana'] text-pink-700">3. Wrap & Add-ons</h3>
+              <div className="space-y-4 sm:space-y-6">
                 {customizations.map((cat) => (
                   <div key={cat._id} className="space-y-3">
-                    <p className="font-semibold text-pink-800 font-['Cinzel']">{cat.label}</p>
+                    <p className="font-semibold text-pink-800 font-['Cinzel'] text-sm sm:text-base">{cat.label}</p>
                     <div className="flex flex-wrap gap-2">
                       {cat.options
                         .filter((o) => o.enabled !== false)
@@ -199,15 +199,15 @@ const BouquetBuilder = ({ onCheckout }) => {
                   </div>
                 ))}
               </div>
-              <div className="flex justify-between">
+              <div className="flex flex-col sm:flex-row justify-between gap-3">
                 <button
-                  className="px-6 py-3 rounded-full bg-white text-pink-700 border border-pink-300 font-['Cinzel'] text-sm tracking-wider hover:bg-pink-50 transition-colors"
+                  className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-full bg-white text-pink-700 border border-pink-300 font-['Cinzel'] tracking-wider hover:bg-pink-50 transition-colors"
                   onClick={() => setStep(2)}
                 >
                   Back
                 </button>
                 <button
-                  className="px-6 py-3 rounded-full bg-pink-600 text-white font-['Cinzel'] text-sm tracking-wider hover:bg-pink-700 transition-colors shadow-lg"
+                  className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-full bg-pink-600 text-white font-['Cinzel'] tracking-wider hover:bg-pink-700 transition-colors shadow-lg"
                   onClick={() => setStep(4)}
                 >
                   Continue
@@ -217,17 +217,17 @@ const BouquetBuilder = ({ onCheckout }) => {
           )}
 
           {step === 4 && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 sm:space-y-6">
               <BouquetPreview selection={selection} flowers={flowers} customizations={customizations} />
-              <div className="flex justify-between">
+              <div className="flex flex-col sm:flex-row justify-between gap-3">
                 <button
-                  className="px-6 py-3 rounded-full bg-white text-pink-700 border border-pink-300 font-['Cinzel'] text-sm tracking-wider hover:bg-pink-50 transition-colors"
+                  className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-full bg-white text-pink-700 border border-pink-300 font-['Cinzel'] tracking-wider hover:bg-pink-50 transition-colors"
                   onClick={() => setStep(3)}
                 >
                   Back
                 </button>
                 <button
-                  className="px-6 py-3 rounded-full bg-pink-600 text-white font-['Cinzel'] text-sm tracking-wider hover:bg-pink-700 transition-colors shadow-lg"
+                  className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-full bg-pink-600 text-white font-['Cinzel'] tracking-wider hover:bg-pink-700 transition-colors shadow-lg"
                   onClick={() => onCheckout()}
                 >
                   Proceed to Checkout
@@ -237,12 +237,12 @@ const BouquetBuilder = ({ onCheckout }) => {
           )}
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6 order-1 lg:order-2">
           <PriceSummary pricing={pricing} deliveryDays={deliveryDays} />
-          <GlassCard className="p-6 space-y-2 text-sm text-pink-800">
+          <GlassCard className="p-4 sm:p-6 space-y-2 text-sm text-pink-800">
             <p className="font-semibold text-pink-900 font-['Cinzel']">Delivery Notes</p>
-            <p>Delivery dates adjust based on quantity and availability.</p>
-            <p>All orders include a complimentary message card.</p>
+            <p className="text-xs sm:text-sm">Delivery dates adjust based on quantity and availability.</p>
+            <p className="text-xs sm:text-sm">All orders include a complimentary message card.</p>
           </GlassCard>
         </div>
       </div>

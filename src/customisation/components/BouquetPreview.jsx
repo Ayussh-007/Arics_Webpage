@@ -20,14 +20,14 @@ const BouquetPreview = ({ selection, flowers, customizations }) => {
     .filter(Boolean)
 
   return (
-    <GlassCard className="p-6 space-y-4">
-      <h3 className="text-xl font-['Italiana'] text-pink-700">Live Preview</h3>
-      <div className="h-40 rounded-xl bg-gradient-to-br from-rose-100 via-pink-100 to-white border border-pink-200 flex items-center justify-center text-pink-600 text-sm font-['Cinzel']">
+    <GlassCard className="p-4 sm:p-6 space-y-3 sm:space-y-4">
+      <h3 className="text-lg sm:text-xl font-['Italiana'] text-pink-700">Live Preview</h3>
+      <div className="h-32 sm:h-40 rounded-xl bg-gradient-to-br from-rose-100 via-pink-100 to-white border border-pink-200 flex items-center justify-center text-pink-600 text-xs sm:text-sm font-['Cinzel']">
         Bouquet Preview Placeholder
       </div>
-      <div className="space-y-2 text-sm text-pink-800">
+      <div className="space-y-2 text-xs sm:text-sm text-pink-800">
         <div>
-          <p className="font-semibold text-pink-900 font-['Cinzel']">Flowers</p>
+          <p className="font-semibold text-pink-900 font-['Cinzel'] text-sm sm:text-base">Flowers</p>
           {selectedFlowers.length ? (
             <ul className="list-disc list-inside">
               {selectedFlowers.map((item) => (
@@ -39,7 +39,7 @@ const BouquetPreview = ({ selection, flowers, customizations }) => {
           )}
         </div>
         <div>
-          <p className="font-semibold text-pink-900 font-['Cinzel']">Wrap & Add-ons</p>
+          <p className="font-semibold text-pink-900 font-['Cinzel'] text-sm sm:text-base">Wrap & Add-ons</p>
           {selectedCustoms.length ? (
             <ul className="list-disc list-inside">
               {selectedCustoms.map((item) => (
