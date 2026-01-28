@@ -37,7 +37,7 @@ const CartPage = ({ onCheckout }) => {
                     <span className="text-xs uppercase tracking-widest font-['Cinzel'] text-rose-700">{item.type === 'custom' ? 'Custom Bouquet' : 'Product'}</span>
                   </div>
                   <div className="font-['Playfair_Display'] text-xl text-gray-900 truncate">{item.name}</div>
-                  <div className="text-sm text-pink-800 font-['Montserrat']">${(item.price).toFixed(2)} each</div>
+                  <div className="text-sm text-pink-800 font-['Montserrat']">₹{(item.price).toFixed(2)} each</div>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
@@ -62,7 +62,7 @@ const CartPage = ({ onCheckout }) => {
             <div className="bg-white/70 border border-white/40 rounded-2xl p-5">
               <div className="flex justify-between text-pink-900 font-['Montserrat'] text-base">
                 <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>₹{subtotal.toFixed(2)}</span>
               </div>
               <p className="mt-2 text-xs text-pink-800">Taxes and delivery calculated at checkout.</p>
               <button

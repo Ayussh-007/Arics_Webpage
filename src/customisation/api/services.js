@@ -20,5 +20,6 @@ export const updateSettings = (payload) => api.put('/admin/settings', payload).t
 
 export const createOrder = (payload) => api.post('/orders', payload).then((r) => r.data)
 export const fetchOrders = () => api.get('/orders').then((r) => r.data)
+export const sendOrderEmail = (orderId, payload) => api.post(`/orders/${orderId}/email`, payload).then((r) => r.data)
 
 export const adminLogin = (payload) => api.post('/auth/login', payload).then((r) => r.data)

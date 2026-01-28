@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useCartStore } from '../store/useCartStore'
+import { createOrder } from '../customisation/api/services'
+import toast from 'react-hot-toast'
 
 const schema = z.object({
   name: z.string().min(2),
@@ -25,15 +27,36 @@ const CheckoutPage = ({ onBack, onComplete }) => {
 
   const total = useMemo(() => subtotal, [subtotal])
 
-  const onSubmit = async () => {
+  const onSubmit = async (values) => {
     try {
       setPlacing(true)
-      // NOTE: Backend integration intentionally deferred.
-      // This is a unified checkout placeholder. Hook up to your API here.
-      await new Promise((r) => setTimeout(r, 800))
+      const payload = {
+        customer: {
+          name: values.name,
+          phone: values.phone,
+          email: values.email,
+          address: values.address,
+        },
+        selection: {
+          quantity: items.reduce((sum, x) => sum + Number(x.quantity || 0), 0),
+          items: items.map((x) => ({
+            type: x.type,
+            refId: x.refId,
+            name: x.name,
+            quantity: x.quantity,
+            unitPrice: x.price,
+          })),
+        },
+        pricing: {
+          total: subtotal,
+        },
+      }
+      await createOrder(payload)
       clear()
+      toast.success('Order placed!')
       onComplete?.()
-      alert('Order placed!')
+    } catch (e) {
+      toast.error('Order failed')
     } finally {
       setPlacing(false)
     }
@@ -80,13 +103,13 @@ const CheckoutPage = ({ onBack, onComplete }) => {
               {items.map((x) => (
                 <div key={x.id} className="flex justify-between text-sm text-pink-900">
                   <span>{x.name} × {x.quantity}</span>
-                  <span>${(x.price * x.quantity).toFixed(2)}</span>
+              <span>₹{(x.price * x.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
             <div className="mt-3 pt-3 border-t border-pink-100 flex justify-between font-['Montserrat']">
               <span>Subtotal</span>
-              <span>${total.toFixed(2)}</span>
+              <span>₹{total.toFixed(2)}</span>
             </div>
             <p className="text-xs text-pink-800 mt-2">Taxes and delivery shown after placing order.</p>
           </div>

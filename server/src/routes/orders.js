@@ -5,6 +5,7 @@ import AdminSettings from '../models/AdminSettings.js'
 import { estimateDelivery } from '../utils/delivery.js'
 import { protect, requireRole } from '../middleware/auth.js'
 import { sendOrderConfirmedEmail } from '../utils/orderEmail.js'
+import { sendMail } from '../lib/mailer.js'
 
 const router = express.Router()
 
@@ -35,6 +36,7 @@ router.patch('/:id', protect, requireRole('admin'), async (req, res, next) => {
     const allowedStatuses = [
       'pending',
       'confirmed',
+      'payment_received',
       'preparing',
       'out_for_delivery',
       'delivered',
@@ -77,6 +79,33 @@ router.post('/:id/confirm', protect, requireRole('admin'), async (req, res, next
     await sendOrderConfirmedEmail(order)
 
     res.json({ ok: true })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Send email using either server-built template (with QR attachment) or custom HTML from client
+router.post('/:id/email', protect, requireRole('admin'), async (req, res, next) => {
+  try {
+    const order = await Order.findById(req.params.id)
+    if (!order) {
+      res.status(404)
+      return next(new Error('Order not found'))
+    }
+
+    const { to, subject, html } = req.body || {}
+    const defaultTo = order.customer?.email
+    const shortId = String(order._id).slice(-6).toUpperCase()
+    const defaultSubject = `Your Arics order is confirmed (#${shortId})`
+
+    if (html && (to || defaultTo)) {
+      const from = process.env.MAIL_FROM || 'Arics <no-reply@arics.com>'
+      await sendMail({ from, to: to || defaultTo, subject: subject || defaultSubject, html })
+      return res.json({ ok: true, mode: 'custom' })
+    }
+
+    await sendOrderConfirmedEmail(order)
+    return res.json({ ok: true, mode: 'built' })
   } catch (err) {
     next(err)
   }

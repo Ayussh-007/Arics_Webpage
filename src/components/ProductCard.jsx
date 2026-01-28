@@ -110,7 +110,7 @@ const ProductCard = ({ product, onViewDetails, onCustomize, onAddToCart }) => {
           {/* Price Section */}
           <div className="flex items-center gap-3 mb-5">
             <span className="text-3xl font-['Playfair_Display'] font-bold text-gray-900">
-              ${effectivePrice.toFixed(2)}
+              ₹{effectivePrice.toFixed(2)}
             </span>
             {hasDiscount && (
               <>

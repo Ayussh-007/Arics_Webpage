@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 import api from '../../api/client'
+import { sendOrderEmail } from '../../customisation/api/services'
 
 const STATUSES = [
   { id: 'pending', label: 'Pending', color: 'bg-amber-100 text-amber-800' },
@@ -79,6 +80,7 @@ const OrdersAdmin = () => {
   const [statusFilter, setStatusFilter] = useState('all')
   const [selected, setSelected] = useState(null)
   const [updating, setUpdating] = useState(false)
+  const [previewHtml, setPreviewHtml] = useState('')
 
   const load = async () => {
     setLoading(true)
@@ -414,18 +416,39 @@ const OrdersAdmin = () => {
                   <button
                     disabled={updating}
                     onClick={() => onUpdateStatus(selected._id, selected.status)}
-                    className="px-4 py-2 rounded-full bg-white/80 border border-pink-200 text-pink-800 text-xs font-['Cinzel'] tracking-wider hover:bg-white disabled:opacity-60"
-                  >
-                    {updating ? 'Saving…' : 'Save status'}
-                  </button>
-
-                  <button
-                    disabled={updating}
-                    onClick={() => onConfirmAndSendMail(selected._id)}
                     className="px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-['Cinzel'] tracking-wider shadow hover:shadow-lg disabled:opacity-60"
-                    title="Marks order as confirmed and emails the customer with payment QR"
                   >
-                    {updating ? 'Sending…' : selected.status === 'confirmed' ? 'Send mail again' : 'Confirm & send mail'}
+                    {updating ? 'Saving…' : 'Save'}
+                  </button>
+                  <button
+                    disabled={updating || !selected.customer?.email}
+                    onClick={async () => {
+                      try {
+                        const html = buildEmailHtml(selected)
+                        setUpdating(true)
+                        await sendOrderEmail(selected._id, {
+                          to: selected.customer?.email,
+                          subject: `Your Arics order is confirmed (#${String(selected._id).slice(-6).toUpperCase()})`,
+                          html,
+                        })
+                        toast.success('Email sent')
+                      } catch (e) {
+                        const msg = getErrorMessage(e)
+                        toast.error(`Email failed: ${msg}`)
+                      } finally {
+                        setUpdating(false)
+                      }
+                    }}
+                    title={!selected.customer?.email ? 'No customer email on order' : 'Send confirmation email'}
+                    className="px-4 py-2 rounded-full bg-white/80 border border-emerald-300 text-emerald-700 text-xs font-['Cinzel'] tracking-wider hover:bg-white disabled:opacity-60"
+                  >
+                    Send mail
+                  </button>
+                  <button
+                    onClick={() => setPreviewHtml(buildEmailHtml(selected))}
+                    className="px-4 py-2 rounded-full bg-white/80 border border-pink-200 text-pink-800 text-xs font-['Cinzel'] tracking-wider hover:bg-white"
+                  >
+                    Preview email
                   </button>
                 </div>
               </div>
@@ -433,8 +456,98 @@ const OrdersAdmin = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Email Preview Modal */}
+      <AnimatePresence>
+        {previewHtml && (
+          <motion.div className="fixed inset-0 z-[110] flex items-end md:items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="absolute inset-0 bg-black/40" onClick={() => setPreviewHtml('')} />
+            <motion.div className="relative w-full md:max-w-3xl bg-white/90 backdrop-blur-xl border border-white/40 rounded-t-3xl md:rounded-3xl shadow-2xl p-0 overflow-hidden"
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 30, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="flex items-center justify-between px-4 py-3 border-b border-pink-100 bg-white/70">
+                <div className="text-sm font-['Cinzel'] tracking-wider text-pink-800">Email preview</div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={async () => { try { await navigator.clipboard.writeText(previewHtml); toast.success('Copied HTML'); } catch { toast.error('Copy failed') } }}
+                    className="px-3 py-1 rounded-full bg-white border border-pink-200 text-pink-800 text-xs font-['Cinzel']"
+                  >Copy HTML</button>
+                  <button
+                    onClick={() => setPreviewHtml('')}
+                    className="px-3 py-1 rounded-full bg-rose-500 text-white text-xs font-['Cinzel']"
+                  >Close</button>
+                </div>
+              </div>
+              <div className="max-h-[70vh] overflow-auto p-4">
+                <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
+}
+function buildEmailHtml(order) {
+  const qrUrl = import.meta.env.VITE_QR_IMAGE_URL || 'https://via.placeholder.com/240x240?text=Scan+to+Pay'
+  const name = order.customer?.name || 'Customer'
+  const id = String(order._id || '').slice(-6).toUpperCase()
+  const lines = []
+  // Flowers
+  if (Array.isArray(order.selection?.flowers) && order.selection.flowers.length) {
+    lines.push('<h4 style="margin:12px 0 4px">Flowers</h4>')
+    lines.push('<ul style="margin:0;padding-left:16px">')
+    for (const f of order.selection.flowers) {
+      lines.push(`<li>${f.name} × ${f.stems}</li>`)
+    }
+    lines.push('</ul>')
+  }
+  // Customizations
+  if (Array.isArray(order.selection?.customizations) && order.selection.customizations.length) {
+    lines.push('<h4 style="margin:12px 0 4px">Customizations</h4>')
+    lines.push('<ul style="margin:0;padding-left:16px">')
+    for (const c of order.selection.customizations) {
+      const qty = c.quantity ? ` × ${c.quantity}` : ''
+      lines.push(`<li>${c.category}: ${c.option}${qty}</li>`)
+    }
+    lines.push('</ul>')
+  }
+  // Generic items (for cart-based orders)
+  if (Array.isArray(order.selection?.items) && order.selection.items.length) {
+    lines.push('<h4 style="margin:12px 0 4px">Items</h4>')
+    lines.push('<ul style="margin:0;padding-left:16px">')
+    for (const it of order.selection.items) {
+      lines.push(`<li>${it.name} × ${it.quantity}</li>`)
+    }
+    lines.push('</ul>')
+  }
+  const total = Number(order.pricing?.total || 0).toFixed(2)
+  return `
+  <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#3f1d38">
+    <p>Hi ${name},</p>
+    <p>Your order <strong>#${id}</strong> has been <strong>confirmed</strong>. Below are the details:</p>
+    ${lines.join('')}
+    <p style="margin-top:12px">Total: <strong>₹${total}</strong></p>
+    <p>Please complete the payment by scanning the QR code below:</p>
+    <p><img src="${qrUrl}" alt="Payment QR" width="240" height="240" style="border:1px solid #f5c2d1; border-radius:8px"/></p>
+    <p>Thank you for choosing Arics 🌸</p>
+  </div>`
+}
+
+function getErrorMessage(err) {
+  if (!err) return 'unknown error'
+  const r = err.response
+  if (r?.data?.message) return r.data.message
+  if (r?.data?.error) return r.data.error
+  if (r?.status) return `${r.status} ${r.statusText || ''}`.trim()
+  return err.message || 'unknown error'
 }
 
 export default OrdersAdmin

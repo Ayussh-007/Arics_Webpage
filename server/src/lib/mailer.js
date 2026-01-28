@@ -13,10 +13,16 @@ export const createTransporter = () => {
   const port = Number(process.env.SMTP_PORT || 587)
   const secure = boolFromEnv(process.env.SMTP_SECURE) ?? port === 465
 
-  if (!host) throw new Error('SMTP_HOST is not set')
-
   const authUser = process.env.SMTP_USER
   const authPass = process.env.SMTP_PASS
+
+  if (!host) {
+    // Dev fallback: don't crash locally, emit emails as JSON (no delivery)
+    if (process.env.NODE_ENV !== 'production') {
+      return nodemailer.createTransport({ jsonTransport: true })
+    }
+    throw new Error('SMTP_HOST is not set')
+  }
 
   return nodemailer.createTransport({
     host,

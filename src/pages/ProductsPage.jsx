@@ -346,7 +346,7 @@ const ProductsPage = () => {
               <div className="p-6 space-y-3">
                 <h3 className="text-2xl font-['Playfair_Display'] text-gray-900">{selected.name}</h3>
                 <p className="text-gray-700 font-['Cormorant_Garamond']">{selected.description}</p>
-                <div className="text-xl font-['Playfair_Display']">${(selected.discountedPrice || selected.originalPrice || 0).toFixed(2)}</div>
+                <div className="text-xl font-['Playfair_Display']">₹{(selected.discountedPrice || selected.originalPrice || 0).toFixed(2)}</div>
                 <div className="flex gap-2 pt-2">
                   <button
                     onClick={() => { handleAddToCart(selected); setSelected(null); }}
