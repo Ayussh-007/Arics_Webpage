@@ -4,6 +4,8 @@ import HeroSection from "./components/HeroSection";
 import ScrollBloomSection from "./components/ScrollBloomSection";
 import AboutUs from "./pages/AboutUs";
 import { CustomisationApp } from "./customisation";
+import ProductsPage from "./pages/ProductsPage";
+import AdminDashboard from "./pages/AdminDashboard";
 import "./App.css";
 
 const App = () => {
@@ -13,6 +15,10 @@ const App = () => {
     switch (currentPage) {
       case "customize":
         return <CustomisationApp />;
+      case "products":
+        return <ProductsPage />;
+      case "admin":
+        return <AdminDashboard />;
       case "about":
         return <AboutUs />;
       case "home":

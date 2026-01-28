@@ -5,6 +5,7 @@ import User from './models/User.js'
 import Flower from './models/Flower.js'
 import CustomizationOption from './models/CustomizationOption.js'
 import AdminSettings from './models/AdminSettings.js'
+import { seedProducts } from './utils/seedProducts.js'
 
 const seed = async () => {
   await connectDB()
@@ -15,6 +16,9 @@ const seed = async () => {
     CustomizationOption.deleteMany({}),
     AdminSettings.deleteMany({}),
   ])
+
+  // Seed products
+  await seedProducts()
 
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@arics.com'
   const adminPassword = process.env.ADMIN_PASSWORD || 'ChangeMe123!'

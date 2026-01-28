@@ -89,26 +89,24 @@ const Navbar = ({ currentPage, setCurrentPage }) => {
               ></span>
             </motion.button>
 
-            <motion.div className="relative group" whileHover={{ y: -2 }}>
-              <button className="flex items-center gap-2 text-pink-800 font-['Cinzel'] text-sm tracking-widest hover:text-pink-600 transition-colors">
-                OUR PRODUCTS
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  className="transition-transform group-hover:rotate-180"
-                >
-                  <path
-                    d="M4 6L8 10L12 6"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </button>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-pink-600 transition-all duration-300 group-hover:w-full"></span>
-            </motion.div>
+            <motion.button
+              onClick={() => handleNavigation("products")}
+              className={`font-['Cinzel'] text-sm tracking-widest transition-colors relative group ${
+                currentPage === "products"
+                  ? "text-pink-600"
+                  : "text-pink-800 hover:text-pink-600"
+              }`}
+              whileHover={{ y: -2 }}
+            >
+              PRODUCTS
+              <span
+                className={`absolute -bottom-1 left-0 h-0.5 bg-pink-600 transition-all duration-300 ${
+                  currentPage === "products"
+                    ? "w-full"
+                    : "w-0 group-hover:w-full"
+                }`}
+              ></span>
+            </motion.button>
 
             <motion.button
               onClick={() => handleNavigation("customize")}
@@ -129,24 +127,14 @@ const Navbar = ({ currentPage, setCurrentPage }) => {
               ></span>
             </motion.button>
 
-            <motion.button
-              onClick={() => handleNavigation("about")}
-              className={`font-['Cinzel'] text-sm tracking-widest transition-colors relative group ${
-                currentPage === "about"
-                  ? "text-pink-600"
-                  : "text-pink-800 hover:text-pink-600"
-              }`}
+            <motion.a
+              href="#about"
+              className="text-pink-800 font-['Cinzel'] text-sm tracking-widest hover:text-pink-600 transition-colors relative group"
               whileHover={{ y: -2 }}
             >
               ABOUT US
-              <span
-                className={`absolute -bottom-1 left-0 h-0.5 bg-pink-600 transition-all duration-300 ${
-                  currentPage === "about"
-                    ? "w-full"
-                    : "w-0 group-hover:w-full"
-                }`}
-              ></span>
-            </motion.button>
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-pink-600 transition-all duration-300 group-hover:w-full"></span>
+            </motion.a>
           </div>
 
           {/* Mobile Menu Button */}
