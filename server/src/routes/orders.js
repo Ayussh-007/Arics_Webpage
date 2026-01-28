@@ -4,6 +4,7 @@ import Flower from '../models/Flower.js'
 import AdminSettings from '../models/AdminSettings.js'
 import { estimateDelivery } from '../utils/delivery.js'
 import { protect, requireRole } from '../middleware/auth.js'
+import { sendOrderConfirmedEmail } from '../utils/orderEmail.js'
 
 const router = express.Router()
 
@@ -53,6 +54,29 @@ router.patch('/:id', protect, requireRole('admin'), async (req, res, next) => {
     }
 
     res.json(order)
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Confirm order + send customer email (admin only)
+router.post('/:id/confirm', protect, requireRole('admin'), async (req, res, next) => {
+  try {
+    const order = await Order.findById(req.params.id)
+    if (!order) {
+      res.status(404)
+      return next(new Error('Order not found'))
+    }
+
+    // Mark confirmed (idempotent)
+    if (order.status !== 'confirmed') {
+      order.status = 'confirmed'
+      await order.save()
+    }
+
+    await sendOrderConfirmedEmail(order)
+
+    res.json({ ok: true })
   } catch (err) {
     next(err)
   }

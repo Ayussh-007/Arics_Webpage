@@ -140,6 +140,20 @@ const OrdersAdmin = () => {
     }
   }
 
+  const onConfirmAndSendMail = async (orderId) => {
+    setUpdating(true)
+    try {
+      await api.post(`/orders/${orderId}/confirm`)
+      toast.success('Confirmation email sent')
+      await load()
+      setSelected((prev) => (prev && prev._id === orderId ? { ...prev, status: 'confirmed' } : prev))
+    } catch (err) {
+      toast.error('Failed to send email (check SMTP + payment QR config)')
+    } finally {
+      setUpdating(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
@@ -400,9 +414,18 @@ const OrdersAdmin = () => {
                   <button
                     disabled={updating}
                     onClick={() => onUpdateStatus(selected._id, selected.status)}
-                    className="px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-['Cinzel'] tracking-wider shadow hover:shadow-lg disabled:opacity-60"
+                    className="px-4 py-2 rounded-full bg-white/80 border border-pink-200 text-pink-800 text-xs font-['Cinzel'] tracking-wider hover:bg-white disabled:opacity-60"
                   >
-                    {updating ? 'Saving…' : 'Save'}
+                    {updating ? 'Saving…' : 'Save status'}
+                  </button>
+
+                  <button
+                    disabled={updating}
+                    onClick={() => onConfirmAndSendMail(selected._id)}
+                    className="px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-['Cinzel'] tracking-wider shadow hover:shadow-lg disabled:opacity-60"
+                    title="Marks order as confirmed and emails the customer with payment QR"
+                  >
+                    {updating ? 'Sending…' : selected.status === 'confirmed' ? 'Send mail again' : 'Confirm & send mail'}
                   </button>
                 </div>
               </div>
