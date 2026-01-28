@@ -1,0 +1,316 @@
+{
+  "exampleProduct": {
+    "_id": "507f1f77bcf86cd799439011",
+    "name": "Valentine's Rose Bouquet",
+    "description": "A stunning arrangement of 24 premium red roses, elegantly wrapped in luxury paper with satin ribbon. Perfect for expressing deep love.",
+    "image": "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=800&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=800&q=80",
+      "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=800&q=80&variant=2"
+    ],
+    "originalPrice": 129.99,
+    "discountedPrice": 99.99,
+    "discountPercentage": 23,
+    "category": "bouquet",
+    "stock": 25,
+    "isActive": true,
+    "isFeatured": true,
+    "hasOffer": true,
+    "offerBadge": "Valentine's Special",
+    "popularity": 150,
+    "tags": ["roses", "romantic", "premium", "bestseller"],
+    "flowers": [
+      {
+        "flowerId": "507f1f77bcf86cd799439012",
+        "quantity": 24
+      }
+    ],
+    "createdAt": "2025-01-15T10:30:00.000Z",
+    "updatedAt": "2025-01-28T14:20:00.000Z"
+  },
+  
+  "categoryOptions": [
+    {
+      "value": "bouquet",
+      "label": "Bouquets",
+      "description": "Hand-tied flower arrangements"
+    },
+    {
+      "value": "arrangement",
+      "label": "Arrangements",
+      "description": "Flowers in vases or containers"
+    },
+    {
+      "value": "plant",
+      "label": "Plants",
+      "description": "Potted plants and succulents"
+    },
+    {
+      "value": "gift",
+      "label": "Gifts",
+      "description": "Gift boxes with flowers and extras"
+    },
+    {
+      "value": "subscription",
+      "label": "Subscriptions",
+      "description": "Recurring flower deliveries"
+    }
+  ],
+  
+  "productStates": {
+    "active": {
+      "isActive": true,
+      "description": "Product is visible to customers",
+      "badge": "Active",
+      "color": "green"
+    },
+    "inactive": {
+      "isActive": false,
+      "description": "Product is hidden from customers",
+      "badge": "Inactive",
+      "color": "gray"
+    },
+    "outOfStock": {
+      "stock": 0,
+      "description": "No stock available",
+      "badge": "Out of Stock",
+      "color": "red"
+    },
+    "lowStock": {
+      "stock": 5,
+      "description": "Stock level below threshold",
+      "badge": "Only X left",
+      "color": "orange"
+    },
+    "featured": {
+      "isFeatured": true,
+      "description": "Highlighted product",
+      "badge": "✨ Featured",
+      "color": "purple"
+    }
+  },
+  
+  "priceCalculations": {
+    "effectivePrice": "discountedPrice || originalPrice",
+    "discountAmount": "originalPrice - discountedPrice",
+    "discountPercentage": "((originalPrice - discountedPrice) / originalPrice) * 100",
+    "hasDiscount": "discountedPrice && discountedPrice < originalPrice"
+  },
+  
+  "validationRules": {
+    "name": {
+      "required": true,
+      "type": "string",
+      "trim": true,
+      "example": "Valentine's Rose Bouquet"
+    },
+    "description": {
+      "required": true,
+      "type": "string",
+      "maxLength": 200,
+      "example": "A beautiful arrangement..."
+    },
+    "image": {
+      "required": true,
+      "type": "string",
+      "format": "url",
+      "example": "https://images.unsplash.com/photo-xyz"
+    },
+    "originalPrice": {
+      "required": true,
+      "type": "number",
+      "min": 0,
+      "example": 129.99
+    },
+    "discountedPrice": {
+      "required": false,
+      "type": "number",
+      "min": 0,
+      "mustBeLessThan": "originalPrice",
+      "example": 99.99
+    },
+    "category": {
+      "required": true,
+      "type": "string",
+      "enum": ["bouquet", "arrangement", "plant", "gift", "subscription"],
+      "default": "bouquet"
+    },
+    "stock": {
+      "required": true,
+      "type": "number",
+      "min": 0,
+      "default": 0,
+      "example": 25
+    },
+    "offerBadge": {
+      "required": false,
+      "type": "string",
+      "maxLength": 50,
+      "example": "Valentine's Special"
+    },
+    "tags": {
+      "required": false,
+      "type": "array",
+      "items": "string",
+      "example": ["roses", "premium", "luxury"]
+    }
+  },
+  
+  "apiExamples": {
+    "getAllProducts": {
+      "method": "GET",
+      "url": "/api/products",
+      "query": {
+        "category": "bouquet",
+        "sortBy": "popularity",
+        "order": "desc",
+        "hasOffer": "true"
+      },
+      "response": {
+        "products": "Product[]",
+        "total": 12,
+        "page": 1,
+        "pages": 2
+      }
+    },
+    "getProductById": {
+      "method": "GET",
+      "url": "/api/products/:id",
+      "response": "Product object"
+    },
+    "createProduct": {
+      "method": "POST",
+      "url": "/api/products",
+      "headers": {
+        "Authorization": "Bearer <admin-token>",
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "name": "New Product",
+        "description": "Description here",
+        "image": "https://...",
+        "originalPrice": 99.99,
+        "category": "bouquet",
+        "stock": 10
+      }
+    },
+    "updateProduct": {
+      "method": "PUT",
+      "url": "/api/products/:id",
+      "headers": {
+        "Authorization": "Bearer <admin-token>",
+        "Content-Type": "application/json"
+      },
+      "body": "Partial or full product data"
+    },
+    "toggleStatus": {
+      "method": "PATCH",
+      "url": "/api/products/:id/toggle",
+      "headers": {
+        "Authorization": "Bearer <admin-token>"
+      }
+    },
+    "deleteProduct": {
+      "method": "DELETE",
+      "url": "/api/products/:id",
+      "headers": {
+        "Authorization": "Bearer <admin-token>"
+      }
+    },
+    "incrementPopularity": {
+      "method": "POST",
+      "url": "/api/products/:id/view",
+      "note": "Called when user views or adds to cart"
+    }
+  },
+  
+  "frontendIntegration": {
+    "fetchProducts": {
+      "file": "src/pages/ProductsPage.jsx",
+      "function": "fetchProducts()",
+      "triggers": ["component mount", "filter change", "sort change"]
+    },
+    "displayProduct": {
+      "file": "src/components/ProductCard.jsx",
+      "props": ["product", "onViewDetails", "onCustomize", "onAddToCart"]
+    },
+    "manageProduct": {
+      "file": "src/pages/AdminDashboard.jsx",
+      "operations": ["create", "read", "update", "delete", "toggle"]
+    },
+    "productForm": {
+      "file": "src/components/ProductForm.jsx",
+      "modes": ["create", "edit"],
+      "validation": "client-side + server-side"
+    }
+  },
+  
+  "testScenarios": {
+    "userFlow": [
+      "1. Navigate to Products page",
+      "2. Browse products in grid",
+      "3. Use search to find 'roses'",
+      "4. Filter by 'bouquet' category",
+      "5. Sort by 'price'",
+      "6. Toggle 'Offers' filter",
+      "7. Hover over product card",
+      "8. Click 'View Details'",
+      "9. Click 'Add to Cart'",
+      "10. Verify popularity incremented"
+    ],
+    "adminFlow": [
+      "1. Login as admin",
+      "2. Navigate to Admin Dashboard",
+      "3. View product statistics",
+      "4. Click '+ Add Product'",
+      "5. Fill in product form",
+      "6. Upload image URL",
+      "7. Set pricing",
+      "8. Add offer badge",
+      "9. Submit form",
+      "10. Verify product in table",
+      "11. Edit product",
+      "12. Toggle active status",
+      "13. Delete product (with confirmation)"
+    ]
+  },
+  
+  "commonIssues": {
+    "imagesNotLoading": {
+      "causes": [
+        "Invalid image URL",
+        "CORS policy blocking",
+        "Image server down"
+      ],
+      "solutions": [
+        "Use CDN URLs (Unsplash, Cloudinary)",
+        "Verify HTTPS protocol",
+        "Check image exists at URL"
+      ]
+    },
+    "productsNotDisplaying": {
+      "causes": [
+        "Backend not running",
+        "Database not seeded",
+        "isActive set to false"
+      ],
+      "solutions": [
+        "Start backend: npm --prefix server start",
+        "Seed database: npm --prefix server run seed",
+        "Check product isActive status"
+      ]
+    },
+    "adminCannotAccess": {
+      "causes": [
+        "Not logged in",
+        "Token expired",
+        "Not admin role"
+      ],
+      "solutions": [
+        "Login with admin credentials",
+        "Clear localStorage and re-login",
+        "Verify user role in database"
+      ]
+    }
+  }
+}
