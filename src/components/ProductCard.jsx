@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import WishlistButton from "./WishlistButton";
 
 const ProductCard = ({ product, onViewDetails, onCustomize, onAddToCart }) => {
   const effectivePrice = product.discountedPrice || product.originalPrice;
@@ -18,6 +19,11 @@ const ProductCard = ({ product, onViewDetails, onCustomize, onAddToCart }) => {
         className="relative bg-white/40 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/20 shadow-lg hover:shadow-2xl transition-all duration-500"
         whileHover={{ y: -8, scale: 1.02 }}
       >
+        {/* Wishlist Button - Top Left */}
+        <div className="absolute top-4 left-4 z-10">
+          <WishlistButton product={product} size="md" />
+        </div>
+
         {/* Offer Badge */}
         {product.hasOffer && (
           <motion.div
@@ -32,14 +38,14 @@ const ProductCard = ({ product, onViewDetails, onCustomize, onAddToCart }) => {
 
         {/* Stock Badge */}
         {product.stock === 0 && (
-          <div className="absolute top-4 left-4 z-10 bg-gray-900/80 backdrop-blur-sm text-white px-4 py-2 rounded-full text-xs font-['Montserrat'] font-medium">
+          <div className="absolute top-16 left-4 z-10 bg-gray-900/80 backdrop-blur-sm text-white px-4 py-2 rounded-full text-xs font-['Montserrat'] font-medium">
             Out of Stock
           </div>
         )}
 
         {/* Featured Badge */}
-        {product.isFeatured && (
-          <div className="absolute top-4 left-4 z-10 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full text-xs font-['Cinzel'] font-semibold tracking-wide shadow-lg">
+        {product.isFeatured && !product.hasOffer && (
+          <div className="absolute top-4 right-4 z-10 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full text-xs font-['Cinzel'] font-semibold tracking-wide shadow-lg">
             ✨ Featured
           </div>
         )}
@@ -68,6 +74,7 @@ const ProductCard = ({ product, onViewDetails, onCustomize, onAddToCart }) => {
               className="bg-white/90 backdrop-blur-sm hover:bg-white text-gray-800 p-3 rounded-full shadow-lg"
               whileHover={{ scale: 1.1, rotate: 5 }}
               whileTap={{ scale: 0.95 }}
+              title="View Details"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -80,6 +87,7 @@ const ProductCard = ({ product, onViewDetails, onCustomize, onAddToCart }) => {
               className="bg-white/90 backdrop-blur-sm hover:bg-white text-gray-800 p-3 rounded-full shadow-lg"
               whileHover={{ scale: 1.1, rotate: -5 }}
               whileTap={{ scale: 0.95 }}
+              title="Customize"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -115,10 +123,10 @@ const ProductCard = ({ product, onViewDetails, onCustomize, onAddToCart }) => {
             {hasDiscount && (
               <>
                 <span className="text-lg font-['Montserrat'] text-gray-400 line-through">
-                  ${product.originalPrice.toFixed(2)}
+                  ₹{product.originalPrice.toFixed(2)}
                 </span>
                 <span className="ml-auto text-sm font-['Cinzel'] font-semibold text-rose-500 bg-rose-50 px-3 py-1 rounded-full">
-                  Save ${(product.originalPrice - product.discountedPrice).toFixed(2)}
+                  Save ₹{(product.originalPrice - product.discountedPrice).toFixed(2)}
                 </span>
               </>
             )}

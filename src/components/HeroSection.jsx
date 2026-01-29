@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import BloomAnimation from "./Bloomanimation";
 
-const HeroSection = () => {
+const HeroSection = ({ onNavigate }) => {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
       {/* Bloom Animation Background */}
@@ -12,6 +12,8 @@ const HeroSection = () => {
       <div className="fixed right-6 top-1/2 -translate-y-1/2 z-20 hidden lg:flex flex-col gap-6">
         <motion.a
           href="https://www.instagram.com/arics._"
+          target="_blank"
+          rel="noopener noreferrer"
           className="w-11 h-11 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-pink-600 hover:bg-pink-100 hover:text-pink-700 transition-all shadow-md hover:shadow-lg"
           whileHover={{ scale: 1.15, rotate: 5 }}
           whileTap={{ scale: 0.95 }}
@@ -38,7 +40,6 @@ const HeroSection = () => {
             <circle cx="18" cy="6" r="1.5" fill="currentColor" />
           </svg>
         </motion.a>
-        
       </div>
 
       {/* Content */}
@@ -77,6 +78,7 @@ const HeroSection = () => {
           ></motion.p>
 
           <motion.button
+            onClick={() => onNavigate && onNavigate('products')}
             className="bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white font-['Cinzel'] font-medium px-12 py-4 rounded-full text-base tracking-wider transition-all shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}

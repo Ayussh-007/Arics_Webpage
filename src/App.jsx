@@ -9,6 +9,9 @@ import ProductsPage from "./pages/ProductsPage";
 import AdminPortal from "./pages/AdminPortal";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
+import WishlistPage from "./pages/WishlistPage";
+import WhatsAppButton from "./components/WhatsAppButton";
+import SEO, { SEOConfigs } from "./components/SEO";
 import "./App.css";
 
 const ADMIN_UNLOCK_STORAGE_KEY = "arics_admin_unlocked";
@@ -44,6 +47,10 @@ const App = () => {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
+  const getSEOConfig = () => {
+    return SEOConfigs[currentPage] || SEOConfigs.home
+  }
+
   const renderPage = () => {
     switch (currentPage) {
       case "customize":
@@ -53,7 +60,7 @@ const App = () => {
           />
         );
       case "products":
-        return <ProductsPage />;
+        return <ProductsPage onNavigateToCustomize={setCurrentPage} />;
       case "cart":
         return <CartPage onCheckout={() => setCurrentPage("checkout")} />;
       case "checkout":
@@ -69,6 +76,8 @@ const App = () => {
           return <HeroSection />;
         }
         return <AdminPortal onExit={() => setCurrentPage("home")} />;
+      case "wishlist":
+        return <WishlistPage />;
       case "about":
         return <AboutUs />;
       case "home":
@@ -80,7 +89,7 @@ const App = () => {
               setCurrentPage={setCurrentPage}
               showAdmin={adminUnlocked}
             />
-            <HeroSection />
+            <HeroSection onNavigate={setCurrentPage} />
           </>
         );
     }
@@ -88,7 +97,9 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
+      <SEO {...getSEOConfig()} />
       <Toaster position="top-right" />
+      <WhatsAppButton phoneNumber="+919XXXXXXXXX" />
       {currentPage === "home" ? (
         renderPage()
       ) : (

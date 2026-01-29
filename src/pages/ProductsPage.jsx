@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "../components/ProductCard";
+import ProductDetailModal from "../components/ProductDetailModal";
+import CustomizationAdBanner from "../components/CustomizationAdBanner";
+import EnhancedSearchBar from "../components/EnhancedSearchBar";
 import { useCartStore } from "../store/useCartStore";
 import toast from "react-hot-toast";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-const ProductsPage = () => {
+const ProductsPage = ({ onNavigateToCustomize }) => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -152,30 +155,13 @@ const ProductsPage = () => {
       >
         <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-lg">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-            {/* Search Bar */}
+            {/* Enhanced Search Bar */}
             <div className="md:col-span-5">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-white/60 backdrop-blur-sm border border-gray-200 rounded-full px-6 py-3 pl-12 font-['Montserrat'] text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all"
-                />
-                <svg
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </div>
+              <EnhancedSearchBar
+                onSearch={setSearchQuery}
+                onSuggestionClick={setSearchQuery}
+                placeholder="Search for flowers, occasions, colors..."
+              />
             </div>
 
             {/* Category Filter */}
@@ -225,6 +211,16 @@ const ProductsPage = () => {
             </div>
           </div>
         </div>
+      </motion.div>
+
+      {/* Customization Ad Banner */}
+      <motion.div
+        className="max-w-7xl mx-auto mb-12"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.6 }}
+      >
+        <CustomizationAdBanner onCustomize={() => onNavigateToCustomize && onNavigateToCustomize('customize')} />
       </motion.div>
 
       {/* Results Count */}
@@ -335,36 +331,12 @@ const ProductsPage = () => {
           ease: "easeInOut",
         }}
       />
-      {/* Details Modal */}
+      {/* Product Detail Modal */}
       {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden">
-            <div className="grid md:grid-cols-2">
-              <div className="h-64 md:h-full bg-rose-50">
-                <img src={selected.image} alt={selected.name} className="w-full h-full object-cover" />
-              </div>
-              <div className="p-6 space-y-3">
-                <h3 className="text-2xl font-['Playfair_Display'] text-gray-900">{selected.name}</h3>
-                <p className="text-gray-700 font-['Cormorant_Garamond']">{selected.description}</p>
-                <div className="text-xl font-['Playfair_Display']">₹{(selected.discountedPrice || selected.originalPrice || 0).toFixed(2)}</div>
-                <div className="flex gap-2 pt-2">
-                  <button
-                    onClick={() => { handleAddToCart(selected); setSelected(null); }}
-                    className="px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-['Cinzel'] text-sm tracking-widest"
-                  >
-                    Add to Cart
-                  </button>
-                  <button
-                    onClick={() => setSelected(null)}
-                    className="px-6 py-3 rounded-full bg-white border border-pink-200 text-pink-800 font-['Cinzel'] text-sm tracking-widest"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ProductDetailModal 
+          product={selected} 
+          onClose={() => setSelected(null)} 
+        />
       )}
     </div>
   );
