@@ -21,7 +21,8 @@ const DEFAULT_FLOWERS = [
     pricePerStem: 50,
     image: 'https://images.unsplash.com/photo-1518709594023-6eab9bab7b23?w=400',
     color: '#dc2626',
-    enabled: true
+    enabled: true,
+    stock: 50
   },
   {
     _id: 'default-lily',
@@ -29,7 +30,8 @@ const DEFAULT_FLOWERS = [
     pricePerStem: 80,
     image: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400',
     color: '#f97316',
-    enabled: true
+    enabled: true,
+    stock: 30
   },
   {
     _id: 'default-tulip',
@@ -37,7 +39,8 @@ const DEFAULT_FLOWERS = [
     pricePerStem: 60,
     image: 'https://images.unsplash.com/photo-1520763185298-1b434c919102?w=400',
     color: '#eab308',
-    enabled: true
+    enabled: true,
+    stock: 40
   },
   {
     _id: 'default-orchid',
@@ -45,7 +48,8 @@ const DEFAULT_FLOWERS = [
     pricePerStem: 100,
     image: 'https://images.unsplash.com/photo-1583623025817-d180a2221d0a?w=400',
     color: '#a855f7',
-    enabled: true
+    enabled: true,
+    stock: 20
   }
 ]
 
@@ -148,6 +152,11 @@ const BouquetBuilder = () => {
     }
     load()
   }, [])
+
+  // Calculate total selected flowers
+  const totalSelectedFlowers = useMemo(() => {
+    return Object.values(selection.flowers || {}).reduce((sum, count) => sum + count, 0)
+  }, [selection.flowers])
 
   const pricing = useMemo(
     () => computePricing({ selection, flowers, customizations, settings }),
@@ -274,7 +283,12 @@ const BouquetBuilder = () => {
 
           {step === 2 && (
             <GlassCard className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-              <h3 className="text-lg sm:text-xl font-['Italiana'] text-pink-700">2. Select Flowers</h3>
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg sm:text-xl font-['Italiana'] text-pink-700">2. Select Flowers</h3>
+                <div className="text-sm font-['Cinzel'] text-pink-700 bg-pink-50 px-3 py-1 rounded-full">
+                  {totalSelectedFlowers} / {selection.quantity} selected
+                </div>
+              </div>
               <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
                 {flowers.map((flower) => (
                   <FlowerCard
@@ -282,6 +296,8 @@ const BouquetBuilder = () => {
                     flower={flower}
                     stems={selection.flowers[flower._id] || 0}
                     onChange={(value) => setFlowerStem(flower._id, value)}
+                    totalSelected={totalSelectedFlowers}
+                    maxTotal={selection.quantity}
                   />
                 ))}
               </div>
