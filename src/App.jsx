@@ -10,6 +10,9 @@ import AdminPortal from "./pages/AdminPortal";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import WishlistPage from "./pages/WishlistPage";
+import ReferralPage from "./pages/ReferralPage";
+import OccasionRemindersPage from "./pages/OccasionRemindersPage";
+import CorporateGiftingPage from "./pages/CorporateGiftingPage";
 import WhatsAppButton from "./components/WhatsAppButton";
 import SEO, { SEOConfigs } from "./components/SEO";
 import "./App.css";
@@ -78,6 +81,12 @@ const App = () => {
         return <AdminPortal onExit={() => setCurrentPage("home")} />;
       case "wishlist":
         return <WishlistPage />;
+      case "referrals":
+        return <ReferralPage />;
+      case "occasions":
+        return <OccasionRemindersPage />;
+      case "corporate":
+        return <CorporateGiftingPage />;
       case "about":
         return <AboutUs />;
       case "home":
