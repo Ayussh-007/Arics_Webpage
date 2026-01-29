@@ -13,7 +13,7 @@ import WishlistPage from "./pages/WishlistPage";
 import ReferralPage from "./pages/ReferralPage";
 import OccasionRemindersPage from "./pages/OccasionRemindersPage";
 import CorporateGiftingPage from "./pages/CorporateGiftingPage";
-import WhatsAppButton from "./components/WhatsAppButton";
+
 import SEO, { SEOConfigs } from "./components/SEO";
 import "./App.css";
 
@@ -108,7 +108,7 @@ const App = () => {
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
       <SEO {...getSEOConfig()} />
       <Toaster position="top-right" />
-      <WhatsAppButton phoneNumber="+919XXXXXXXXX" />
+
       {currentPage === "home" ? (
         renderPage()
       ) : (

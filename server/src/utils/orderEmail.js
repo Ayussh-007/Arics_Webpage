@@ -69,36 +69,8 @@ const getQrFromAssets = async () => {
 }
 
 export const sendOrderConfirmedEmail = async (order) => {
-  const to = order.customer?.email
-  if (!to) return
-  const from = process.env.MAIL_FROM || 'Arics <no-reply@arics.com>'
-  const shortId = String(order._id).slice(-6).toUpperCase()
-  
-  // Use hosted QR URL for maximum compatibility
-  const qrUrl = 'https://i.ibb.co/tMsXbdc/qr.png'
-
-  const html = `
-  <div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; line-height: 1.5; color: #111827; max-width:640px; margin:0 auto; padding:18px;">
-    <div style="padding:16px; border:1px solid rgba(236,72,153,0.2); border-radius:14px; background:linear-gradient(135deg,#fff1f2,#fdf2f8,#f5f3ff)">
-      <div style="font-size:12px; letter-spacing:0.25em; text-transform:uppercase; color:#be185d; font-weight:700;">Arics</div>
-      <div style="font-size:24px; font-weight:800; margin-top:6px;">Order Confirmed</div>
-      <p style="margin:8px 0 0; color:#374151;">Order <strong>#${shortId}</strong></p>
-      <p style="margin:6px 0 0; color:#374151;">Thank you for your order! We've received it and will begin preparing your beautiful bouquet.</p>
-    </div>
-    <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
-      <div style="font-size:14px; font-weight:800;">Order Details</div>
-      <p style="margin:6px 0 0; color:#374151;"><strong>Total:</strong> ₹${(order.pricing?.total || 0).toFixed(2)}</p>
-      <p style="margin:6px 0 0; color:#374151;"><strong>Delivery:</strong> ${order.deliveryEstimate || 'To be confirmed'}</p>
-    </div>
-    <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
-      <div style="font-size:14px; font-weight:800;">Payment</div>
-      <p style="margin:6px 0 0; color:#374151;">Scan the QR code below to complete your payment.</p>
-      <div style="margin-top:10px; text-align:center;"><img src="${qrUrl}" width="220" height="220" alt="Payment QR" style="border-radius:12px; border:1px solid rgba(236,72,153,0.18)"/></div>
-    </div>
-  </div>`
-
-  // Send without attachment for better compatibility
-  await sendMail({ from, to, subject: `Arics • Order Confirmed (#${shortId})`, html })
+  // Just call sendStatusEmail with 'confirmed' status to ensure consistency
+  return sendStatusEmail(order, 'confirmed')
 }
 
 export const sendStatusEmail = async (order, status) => {
@@ -108,8 +80,17 @@ export const sendStatusEmail = async (order, status) => {
   const shortId = String(order._id).slice(-6).toUpperCase()
   const total = (order.pricing?.total || 0).toFixed(2)
   
-  // Use hosted QR URL for maximum compatibility
-  const qrUrl = 'https://i.ibb.co/tMsXbdc/qr.png'
+  // Format delivery date for display
+  let deliveryDateText = 'To be confirmed'
+  if (order.deliveryEstimate) {
+    if (order.deliveryEstimate.startDate && order.deliveryEstimate.endDate) {
+      deliveryDateText = `${order.deliveryEstimate.startDate} - ${order.deliveryEstimate.endDate}`
+    } else if (order.deliveryEstimate.startDate) {
+      deliveryDateText = order.deliveryEstimate.startDate
+    } else if (order.deliveryEstimate.days) {
+      deliveryDateText = `${order.deliveryEstimate.days} days`
+    }
+  }
 
   // Email templates for each status
   const emailTemplates = {
@@ -145,12 +126,18 @@ export const sendStatusEmail = async (order, status) => {
         <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
           <div style="font-size:14px; font-weight:800;">Order Details</div>
           <p style="margin:6px 0 0; color:#374151;"><strong>Total:</strong> ₹${total}</p>
-          <p style="margin:6px 0 0; color:#374151;"><strong>Delivery:</strong> ${order.deliveryEstimate || 'To be confirmed'}</p>
+          <p style="margin:6px 0 0; color:#374151;"><strong>Delivery:</strong> ${deliveryDateText}</p>
         </div>
         <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
           <div style="font-size:14px; font-weight:800;">💳 Payment Required</div>
-          <p style="margin:6px 0 0; color:#374151;">Please scan the QR code below to complete your payment.</p>
-          <div style="margin-top:10px; text-align:center;"><img src="${qrUrl}" width="220" height="220" alt="Payment QR" style="border-radius:12px; border:1px solid rgba(236,72,153,0.18)"/></div>
+          <p style="margin:6px 0 0; color:#374151;">To complete your payment of <strong>₹${total}</strong>, please open the QR code using the link below:</p>
+          <div style="margin:16px 0; padding:12px; background:#f9fafb; border-radius:8px; text-align:center;">
+            <a href="https://timely-bubblegum-4da5f4.netlify.app/qrcode.png" 
+               style="color:#be185d; font-weight:600; text-decoration:none; word-break:break-all;">
+              https://timely-bubblegum-4da5f4.netlify.app/qrcode.png
+            </a>
+          </div>
+          <p style="margin:6px 0 0; color:#6b7280; font-size:13px;">Click the link to open the QR code, then scan it with any UPI app to pay ₹${total}</p>
         </div>
       `,
       includeQr: false
@@ -168,7 +155,7 @@ export const sendStatusEmail = async (order, status) => {
         <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
           <div style="font-size:14px; font-weight:800;">What's Next?</div>
           <p style="margin:6px 0 0; color:#374151;">Our expert florists will now begin preparing your beautiful bouquet with the utmost care.</p>
-          <p style="margin:6px 0 0; color:#374151;">Expected delivery: <strong>${order.deliveryEstimate || 'Soon'}</strong></p>
+          <p style="margin:6px 0 0; color:#374151;">Expected delivery: <strong>${deliveryDateText}</strong></p>
         </div>
       `,
       includeQr: false
@@ -276,11 +263,7 @@ export const sendStatusEmail = async (order, status) => {
     ${template.content}
   </div>`
 
-  const attachments = []
-  if (template.includeQr) {
-    const qr = await getQrFromAssets()
-    attachments.push({ filename: `arics-qr-${shortId}.png`, content: qr, cid: 'paymentqr', contentType: 'image/png' })
-  }
-
-  await sendMail({ from, to, subject: `Arics • ${template.subject}`, html, attachments })
+  const mailOptions = { from, to, subject: `Arics • ${template.subject}`, html }
+  
+  await sendMail(mailOptions)
 }

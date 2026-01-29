@@ -104,7 +104,7 @@ const EnhancedSearchBar = ({ onSearch, onSuggestionClick, placeholder = "Search 
   }
   
   return (
-    <div ref={searchRef} className="relative w-full">
+    <div ref={searchRef} className="relative w-full z-[9999]">
       <form onSubmit={handleSubmit}>
         <div className="relative">
           {/* Search Icon */}
@@ -152,7 +152,7 @@ const EnhancedSearchBar = ({ onSearch, onSuggestionClick, placeholder = "Search 
       <AnimatePresence>
         {showSuggestions && (query || suggestions.length > 0) && (
           <motion.div
-            className="absolute top-full mt-2 w-full bg-white/95 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-2xl overflow-hidden z-50"
+            className="absolute top-full mt-2 w-full bg-white/95 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-2xl overflow-hidden z-[9999]"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}

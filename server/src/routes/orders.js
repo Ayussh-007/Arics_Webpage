@@ -44,14 +44,23 @@ router.patch('/:id', protect, requireRole('admin'), async (req, res, next) => {
       'cancelled',
     ]
 
-    const { status } = req.body
+    const { status, deliveryEstimate } = req.body
     if (!allowedStatuses.includes(status)) {
       res.status(400)
       return next(new Error('Invalid status'))
     }
 
     const prev = await Order.findById(req.params.id)
-    const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true })
+    
+    // Prepare update object
+    const updateData = { status }
+    
+    // If deliveryEstimate is provided, update it
+    if (deliveryEstimate) {
+      updateData.deliveryEstimate = deliveryEstimate
+    }
+    
+    const order = await Order.findByIdAndUpdate(req.params.id, updateData, { new: true })
     if (!order) {
       res.status(404)
       return next(new Error('Order not found'))
