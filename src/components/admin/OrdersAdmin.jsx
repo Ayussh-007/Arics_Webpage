@@ -496,8 +496,8 @@ const OrdersAdmin = () => {
   )
 }
 function buildEmailHtml(order) {
-  // Build QR URL - use actual qr.png path from server
-  const qrUrl = import.meta.env.VITE_QR_IMAGE_URL || 'https://via.placeholder.com/240x240?text=Scan+to+Pay'
+  // Build QR URL - use hosted Netlify URL for maximum compatibility
+  const qrUrl = 'https://timely-bubblegum-4da5f4.netlify.app/qrcode.png'
   const name = order.customer?.name || 'Customer'
   const id = String(order._id || '').slice(-6).toUpperCase()
   const total = Number(order.pricing?.total || 0).toFixed(2)
