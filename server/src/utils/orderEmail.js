@@ -130,14 +130,13 @@ export const sendStatusEmail = async (order, status) => {
         </div>
         <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
           <div style="font-size:14px; font-weight:800;">💳 Payment Required</div>
-          <p style="margin:6px 0 0; color:#374151;">To complete your payment of <strong>₹${total}</strong>, please open the QR code using the link below:</p>
-          <div style="margin:16px 0; padding:12px; background:#f9fafb; border-radius:8px; text-align:center;">
-            <a href="https://timely-bubblegum-4da5f4.netlify.app/qrcode.png" 
-               style="color:#be185d; font-weight:600; text-decoration:none; word-break:break-all;">
+          <p style="margin:6px 0 0; color:#374151;">To complete your payment of <strong>₹${total}</strong>, please use this link to access the QR code:</p>
+          <div style="margin:16px 0; padding:12px; background:#f9fafb; border-radius:8px;">
+            <p style="margin:0; color:#be185d; font-weight:600; word-break:break-all; font-size:14px;">
               https://timely-bubblegum-4da5f4.netlify.app/qrcode.png
-            </a>
+            </p>
           </div>
-          <p style="margin:6px 0 0; color:#6b7280; font-size:13px;">Click the link to open the QR code, then scan it with any UPI app to pay ₹${total}</p>
+          <p style="margin:6px 0 0; color:#6b7280; font-size:13px;">Copy and paste this link in your browser to view the QR code, then scan it with any UPI app to pay ₹${total}</p>
         </div>
       `,
       includeQr: false
