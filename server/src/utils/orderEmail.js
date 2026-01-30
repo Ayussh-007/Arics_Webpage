@@ -69,41 +69,8 @@ const getQrFromAssets = async () => {
 }
 
 export const sendOrderConfirmedEmail = async (order) => {
-<<<<<<< HEAD
-  const to = order.customer?.email
-  if (!to) return
-  const from = process.env.MAIL_FROM || 'Arics <no-reply@arics.com>'
-  const shortId = String(order._id).slice(-6).toUpperCase()
-  
-  // Use hosted QR URL for maximum compatibility
-  const qrUrl = 'https://timely-bubblegum-4da5f4.netlify.app/qrcode.png'
-
-  const html = `
-  <div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; line-height: 1.5; color: #111827; max-width:640px; margin:0 auto; padding:18px;">
-    <div style="padding:16px; border:1px solid rgba(236,72,153,0.2); border-radius:14px; background:linear-gradient(135deg,#fff1f2,#fdf2f8,#f5f3ff)">
-      <div style="font-size:12px; letter-spacing:0.25em; text-transform:uppercase; color:#be185d; font-weight:700;">Arics</div>
-      <div style="font-size:24px; font-weight:800; margin-top:6px;">Order Confirmed</div>
-      <p style="margin:8px 0 0; color:#374151;">Order <strong>#${shortId}</strong></p>
-      <p style="margin:6px 0 0; color:#374151;">Thank you for your order! We've received it and will begin preparing your beautiful bouquet.</p>
-    </div>
-    <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
-      <div style="font-size:14px; font-weight:800;">Order Details</div>
-      <p style="margin:6px 0 0; color:#374151;"><strong>Total:</strong> ₹${(order.pricing?.total || 0).toFixed(2)}</p>
-      <p style="margin:6px 0 0; color:#374151;"><strong>Delivery:</strong> ${order.deliveryEstimate || 'To be confirmed'}</p>
-    </div>
-    <div style="margin-top:16px; padding:16px; border:1px solid rgba(236,72,153,0.18); border-radius:14px; background:#fff;">
-      <div style="font-size:14px; font-weight:800;">Payment</div>
-      <p style="margin:6px 0 0; color:#374151;">Scan the QR code below to complete your payment.</p>
-      <div style="margin-top:10px; text-align:center;"><img src="${qrUrl}" width="220" height="220" alt="Payment QR" style="border-radius:12px; border:1px solid rgba(236,72,153,0.18)"/></div>
-    </div>
-  </div>`
-
-  // Send without attachment for better compatibility
-  await sendMail({ from, to, subject: `Arics • Order Confirmed (#${shortId})`, html })
-=======
   // Just call sendStatusEmail with 'confirmed' status to ensure consistency
   return sendStatusEmail(order, 'confirmed')
->>>>>>> 4fb1482e00da67b1061bb90899fb6caaa631504d
 }
 
 export const sendStatusEmail = async (order, status) => {
@@ -113,10 +80,6 @@ export const sendStatusEmail = async (order, status) => {
   const shortId = String(order._id).slice(-6).toUpperCase()
   const total = (order.pricing?.total || 0).toFixed(2)
   
-<<<<<<< HEAD
-  // Use hosted QR URL for maximum compatibility
-  const qrUrl = 'https://timely-bubblegum-4da5f4.netlify.app/qrcode.png'
-=======
   // Format delivery date for display
   let deliveryDateText = 'To be confirmed'
   if (order.deliveryEstimate) {
@@ -128,7 +91,6 @@ export const sendStatusEmail = async (order, status) => {
       deliveryDateText = `${order.deliveryEstimate.days} days`
     }
   }
->>>>>>> 4fb1482e00da67b1061bb90899fb6caaa631504d
 
   // Email templates for each status
   const emailTemplates = {
