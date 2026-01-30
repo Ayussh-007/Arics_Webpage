@@ -47,6 +47,7 @@ const ProductsPage = ({ onNavigateToCustomize }) => {
       setFilteredProducts(data.products || []);
     } catch (error) {
       console.error("Error fetching products:", error);
+      toast.error("Failed to load products");
     } finally {
       setLoading(false);
     }
@@ -112,16 +113,16 @@ const ProductsPage = ({ onNavigateToCustomize }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 py-20 px-6 lg:px-12">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 pt-16 sm:pt-20 pb-12 px-4 sm:px-6 lg:px-12">
       {/* Header */}
       <motion.div
-        className="max-w-7xl mx-auto mb-16 text-center"
+        className="max-w-7xl mx-auto mb-8 sm:mb-12 lg:mb-16 text-center"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
         <motion.h1
-          className="text-5xl md:text-6xl lg:text-7xl font-['Playfair_Display'] font-bold text-gray-900 mb-4"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-['Playfair_Display'] font-bold text-gray-900 mb-3 sm:mb-4"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.6 }}
@@ -129,7 +130,7 @@ const ProductsPage = ({ onNavigateToCustomize }) => {
           Our Collection
         </motion.h1>
         <motion.p
-          className="text-xl md:text-2xl font-['Cormorant_Garamond'] text-gray-700 italic"
+          className="text-lg sm:text-xl md:text-2xl font-['Cormorant_Garamond'] text-gray-700 italic"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.6 }}
@@ -139,7 +140,7 @@ const ProductsPage = ({ onNavigateToCustomize }) => {
 
         {/* Decorative line */}
         <motion.div
-          className="w-24 h-1 bg-gradient-to-r from-pink-400 to-rose-400 mx-auto mt-8 rounded-full"
+          className="w-24 h-1 bg-gradient-to-r from-pink-400 to-rose-400 mx-auto mt-6 sm:mt-8 rounded-full"
           initial={{ width: 0 }}
           animate={{ width: 96 }}
           transition={{ delay: 0.6, duration: 0.8 }}
@@ -148,28 +149,28 @@ const ProductsPage = ({ onNavigateToCustomize }) => {
 
       {/* Filters & Search Bar */}
       <motion.div
-        className="max-w-7xl mx-auto mb-12 relative z-[10000]"
+        className="max-w-7xl mx-auto mb-6 sm:mb-8 lg:mb-12 relative z-10"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8, duration: 0.6 }}
       >
-        <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-lg">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+        <div className="bg-white/40 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-white/20 shadow-lg">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4 items-end">
             {/* Enhanced Search Bar */}
-            <div className="md:col-span-5">
+            <div className="sm:col-span-2 lg:col-span-5">
               <EnhancedSearchBar
                 onSearch={setSearchQuery}
                 onSuggestionClick={setSearchQuery}
-                placeholder="Search for flowers, occasions, colors..."
+                placeholder="Search flowers..."
               />
             </div>
 
             {/* Category Filter */}
-            <div className="md:col-span-3">
+            <div className="lg:col-span-3">
               <select
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
-                className="w-full bg-white/60 backdrop-blur-sm border border-gray-200 rounded-full px-6 py-3 font-['Montserrat'] text-gray-700 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all cursor-pointer"
+                className="w-full bg-white/60 backdrop-blur-sm border border-gray-200 rounded-full px-4 sm:px-6 py-2.5 sm:py-3 font-['Montserrat'] text-sm sm:text-base text-gray-700 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all cursor-pointer"
               >
                 {categories.map((cat) => (
                   <option key={cat.value} value={cat.value}>
@@ -180,11 +181,11 @@ const ProductsPage = ({ onNavigateToCustomize }) => {
             </div>
 
             {/* Sort By */}
-            <div className="md:col-span-3">
+            <div className="lg:col-span-3">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="w-full bg-white/60 backdrop-blur-sm border border-gray-200 rounded-full px-6 py-3 font-['Montserrat'] text-gray-700 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all cursor-pointer"
+                className="w-full bg-white/60 backdrop-blur-sm border border-gray-200 rounded-full px-4 sm:px-6 py-2.5 sm:py-3 font-['Montserrat'] text-sm sm:text-base text-gray-700 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all cursor-pointer"
               >
                 {sortOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -195,10 +196,10 @@ const ProductsPage = ({ onNavigateToCustomize }) => {
             </div>
 
             {/* Offers Toggle */}
-            <div className="md:col-span-1 flex justify-center">
+            <div className="sm:col-span-2 lg:col-span-1 flex justify-start sm:justify-center">
               <motion.button
                 onClick={() => setFilterOffers(!filterOffers)}
-                className={`px-6 py-3 rounded-full font-['Cinzel'] font-semibold text-sm tracking-wider transition-all shadow-md ${
+                className={`w-full sm:w-auto px-6 py-2.5 sm:py-3 rounded-full font-['Cinzel'] font-semibold text-xs sm:text-sm tracking-wider transition-all shadow-md ${
                   filterOffers
                     ? "bg-gradient-to-r from-pink-400 to-rose-400 text-white"
                     : "bg-white/60 backdrop-blur-sm text-gray-700 border border-gray-200"
@@ -215,7 +216,7 @@ const ProductsPage = ({ onNavigateToCustomize }) => {
 
       {/* Customization Ad Banner */}
       <motion.div
-        className="max-w-7xl mx-auto mb-12"
+        className="max-w-7xl mx-auto mb-6 sm:mb-8 lg:mb-12"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.6 }}
@@ -225,7 +226,7 @@ const ProductsPage = ({ onNavigateToCustomize }) => {
 
       {/* Results Count */}
       <motion.div
-        className="max-w-7xl mx-auto mb-8"
+        className="max-w-7xl mx-auto mb-4 sm:mb-6 lg:mb-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1, duration: 0.6 }}
@@ -251,7 +252,7 @@ const ProductsPage = ({ onNavigateToCustomize }) => {
       <AnimatePresence mode="wait">
         {!loading && filteredProducts.length > 0 && (
           <motion.div
-            className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -278,16 +279,16 @@ const ProductsPage = ({ onNavigateToCustomize }) => {
         {/* Empty State */}
         {!loading && filteredProducts.length === 0 && (
           <motion.div
-            className="text-center py-20"
+            className="text-center py-12 sm:py-20"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="text-6xl mb-6">🌸</div>
-            <h3 className="text-2xl font-['Playfair_Display'] font-bold text-gray-800 mb-2">
+            <div className="text-5xl sm:text-6xl mb-4 sm:mb-6">🌸</div>
+            <h3 className="text-xl sm:text-2xl font-['Playfair_Display'] font-bold text-gray-800 mb-2">
               No products found
             </h3>
-            <p className="text-gray-600 font-['Cormorant_Garamond'] text-lg mb-6">
+            <p className="text-gray-600 font-['Cormorant_Garamond'] text-base sm:text-lg mb-4 sm:mb-6 px-4">
               Try adjusting your filters or search query
             </p>
             <motion.button
@@ -296,7 +297,7 @@ const ProductsPage = ({ onNavigateToCustomize }) => {
                 setFilterCategory("all");
                 setFilterOffers(false);
               }}
-              className="bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white font-['Cinzel'] font-medium px-8 py-3 rounded-full text-sm tracking-wider transition-all shadow-lg hover:shadow-xl"
+              className="bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white font-['Cinzel'] font-medium px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm tracking-wider transition-all shadow-lg hover:shadow-xl"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -306,9 +307,9 @@ const ProductsPage = ({ onNavigateToCustomize }) => {
         )}
       </AnimatePresence>
 
-      {/* Decorative Elements */}
+      {/* Decorative Elements - Hidden on small mobile */}
       <motion.div
-        className="fixed bottom-20 right-10 w-20 h-20 border-2 border-pink-300/40 rounded-full pointer-events-none"
+        className="hidden sm:block fixed bottom-20 right-10 w-16 sm:w-20 h-16 sm:h-20 border-2 border-pink-300/40 rounded-full pointer-events-none"
         animate={{
           scale: [1, 1.2, 1],
           rotate: [0, 180, 360],
@@ -320,7 +321,7 @@ const ProductsPage = ({ onNavigateToCustomize }) => {
         }}
       />
       <motion.div
-        className="fixed top-40 right-20 w-16 h-16 border-2 border-rose-300/40 rounded-full pointer-events-none"
+        className="hidden lg:block fixed top-40 right-20 w-16 h-16 border-2 border-rose-300/40 rounded-full pointer-events-none"
         animate={{
           scale: [1, 1.3, 1],
           rotate: [360, 180, 0],
@@ -331,6 +332,7 @@ const ProductsPage = ({ onNavigateToCustomize }) => {
           ease: "easeInOut",
         }}
       />
+      
       {/* Product Detail Modal */}
       {selected && (
         <ProductDetailModal 

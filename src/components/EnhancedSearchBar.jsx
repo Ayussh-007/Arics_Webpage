@@ -104,12 +104,12 @@ const EnhancedSearchBar = ({ onSearch, onSuggestionClick, placeholder = "Search 
   }
   
   return (
-    <div ref={searchRef} className="relative w-full z-[9999]">
+    <div ref={searchRef} className="relative w-full">
       <form onSubmit={handleSubmit}>
         <div className="relative">
           {/* Search Icon */}
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -127,7 +127,7 @@ const EnhancedSearchBar = ({ onSearch, onSuggestionClick, placeholder = "Search 
             onFocus={() => setShowSuggestions(true)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="w-full bg-white/60 backdrop-blur-sm border border-gray-200 rounded-full px-12 py-3 font-['Lato'] text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all"
+            className="w-full bg-white/60 backdrop-blur-sm border border-gray-200 rounded-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-2.5 sm:py-3 font-['Lato'] text-sm sm:text-base text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all"
           />
           
           {/* Clear Button */}
@@ -138,9 +138,9 @@ const EnhancedSearchBar = ({ onSearch, onSuggestionClick, placeholder = "Search 
                 setQuery('')
                 setSuggestions([])
               }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -152,7 +152,7 @@ const EnhancedSearchBar = ({ onSearch, onSuggestionClick, placeholder = "Search 
       <AnimatePresence>
         {showSuggestions && (query || suggestions.length > 0) && (
           <motion.div
-            className="absolute top-full mt-2 w-full bg-white/95 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-2xl overflow-hidden z-[9999]"
+            className="absolute top-full mt-2 w-full bg-white/95 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-2xl overflow-hidden z-50 max-h-[60vh] overflow-y-auto"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -160,30 +160,30 @@ const EnhancedSearchBar = ({ onSearch, onSuggestionClick, placeholder = "Search 
           >
             {suggestions.length > 0 ? (
               <div className="py-2">
-                <div className="px-4 py-2 text-xs font-['Montserrat'] font-semibold text-gray-500 uppercase tracking-wider">
+                <div className="px-3 sm:px-4 py-2 text-xs font-['Montserrat'] font-semibold text-gray-500 uppercase tracking-wider">
                   Suggestions
                 </div>
                 {suggestions.map((suggestion, index) => (
                   <motion.button
                     key={index}
                     onClick={() => handleSuggestionClick(suggestion)}
-                    className={`w-full px-4 py-3 flex items-center gap-3 hover:bg-pink-50 transition-colors text-left ${
+                    className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-3 hover:bg-pink-50 transition-colors text-left ${
                       selectedIndex === index ? 'bg-pink-50' : ''
                     }`}
                     whileHover={{ x: 4 }}
                   >
-                    <span className="text-2xl">{suggestion.icon}</span>
-                    <div className="flex-1">
-                      <div className="font-['Lato'] text-gray-900">{suggestion.text}</div>
+                    <span className="text-xl sm:text-2xl">{suggestion.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-['Lato'] text-sm sm:text-base text-gray-900 truncate">{suggestion.text}</div>
                     </div>
-                    <span className={`text-xs font-['Montserrat'] px-2 py-1 rounded-full ${getTypeColor(suggestion.type)}`}>
+                    <span className={`text-[10px] sm:text-xs font-['Montserrat'] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full whitespace-nowrap ${getTypeColor(suggestion.type)}`}>
                       {suggestion.type}
                     </span>
                   </motion.button>
                 ))}
               </div>
             ) : query ? (
-              <div className="px-4 py-8 text-center text-gray-500 font-['Lato']">
+              <div className="px-3 sm:px-4 py-6 sm:py-8 text-center text-gray-500 font-['Lato'] text-sm sm:text-base">
                 No suggestions found
               </div>
             ) : null}
@@ -191,18 +191,18 @@ const EnhancedSearchBar = ({ onSearch, onSuggestionClick, placeholder = "Search 
             {/* Trending Searches */}
             {!query && (
               <div className="border-t border-gray-200 py-2">
-                <div className="px-4 py-2 text-xs font-['Montserrat'] font-semibold text-gray-500 uppercase tracking-wider">
+                <div className="px-3 sm:px-4 py-2 text-xs font-['Montserrat'] font-semibold text-gray-500 uppercase tracking-wider">
                   🔥 Trending Searches
                 </div>
                 {popularSearches.slice(0, 4).map((item, index) => (
                   <motion.button
                     key={index}
                     onClick={() => handleSuggestionClick(item)}
-                    className="w-full px-4 py-2 flex items-center gap-3 hover:bg-pink-50 transition-colors text-left"
+                    className="w-full px-3 sm:px-4 py-2 flex items-center gap-2 sm:gap-3 hover:bg-pink-50 transition-colors text-left"
                     whileHover={{ x: 4 }}
                   >
-                    <span className="text-xl">{item.icon}</span>
-                    <span className="font-['Lato'] text-gray-700 text-sm">{item.text}</span>
+                    <span className="text-lg sm:text-xl">{item.icon}</span>
+                    <span className="font-['Lato'] text-gray-700 text-xs sm:text-sm truncate">{item.text}</span>
                   </motion.button>
                 ))}
               </div>
